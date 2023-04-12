@@ -1,0 +1,20 @@
+{
+  "name": "noticount",
+  "version": "0.1.0",
+  "description": "a node.js web service for automate accounting via chatGPT, Telegram bot and Notion.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrainLopez/noticount.git"
+  },
+  "author": "Prainy",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/PrainLopez/noticount/issues"
+  },
+  "homepage": "https://github.com/PrainLopez/noticount#readme"
+}
