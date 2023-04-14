@@ -6,6 +6,7 @@ const teleWebhook = express();
 
 teleWebhook.get('/', (req, res) => {  // res need to be removed.
     console.log(req.body);
+    res.send('pong!'); //to be removed
 });
 
 teleWebhook.listen(port, () => {
