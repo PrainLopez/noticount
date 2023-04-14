@@ -10,5 +10,5 @@ teleWebhook.get('/', (req, res) => {  // res need to be removed.
 });
 
 teleWebhook.listen(port, () => {
-    console.log('Listening Telegram Webhook on port ${port}.');
+    console.log('Listening Telegram Webhook on port %d.', port);
 });
