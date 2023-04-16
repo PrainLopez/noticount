@@ -1,14 +1,16 @@
 const express = require('express');
 const port = 16913;
-const secretToken = "Prainy_here";
+const userId = 123456789; // Your Telegram ID
 
 const teleWebhook = express();
 
-teleWebhook.use(express.json())
+teleWebhook.use(express.json()) // for parsing application/json
 
-teleWebhook.get('/', (req, res) => {  // res need to be removed.
-    console.log(req.body);
-    res.send('pong!'); //to be removed
+// Receive message from Telegram
+teleWebhook.get('/', (req, res) => { // res need to be removed.
+    console.log(req.body); // for test
+    res.send('pong!'); // for test, no need to response anything.
+    const message = JSON.parse(req.body); //
 });
 
 teleWebhook.listen(port, () => {
