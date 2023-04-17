@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "testTele": "nodemon teleRecv.js",
-    "testGPT": "nodemon gptParse.js",
-    "testNotion": "nodemon notionWrite.js"
+    "testTele": "nodemon lib/teleRecv.js",
+    "testGPT": "nodemon lib/gptParse.js",
+    "testNotion": "nodemon lib/notionWrite.js"
   },
   "repository": {
     "type": "git",
