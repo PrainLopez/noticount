@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/PrainLopez/noticount#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
