@@ -1,6 +1,5 @@
 // 这里更像一个主程序而非功能模块
 const express = require('express');
-const winston = require('winston');
 const config = require('../config');
 
 const teleWebhook = express();
