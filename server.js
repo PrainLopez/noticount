@@ -30,19 +30,21 @@ teleWebhook.use(express.json())
 
 // Receive message from Telegram
 teleWebhook.use('/', function (req, res) {
+    const body = req.body;
     msg = {};
     
-    if (req.body.message.chat.type == 'private') {
-        msg.upd_id = req.body.update_id;
-        msg.user_id = req.body.message.from.id;
-        msg.user_name = req.body.message.from.username;
-        msg.date = req.body.message.date;
-        msg.text = req.body.message.text;
+    if (body.message.chat.type == 'private') {
+        msg.upd_id = body.update_id;
+        msg.user_id = body.message.from.id;
+        msg.user_name = body.message.from.username;
+        msg.date = body.message.date;
+        msg.text = body.message.text;
     }
     else{
         next(errGen(400, 'not private chat'));
     }
-    res.send(msg);
+    req.extracted = msg;
+    res.send(msg); // TODO: 测试用，应删除
     
     });
 
