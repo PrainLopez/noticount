@@ -14,13 +14,14 @@ function errGen(status, msg){
 // Authenticate secrest token
 teleWebhook.use('/', function(req, res, next) {
     console.log('Authenticating...')
-    //check secretToken
+    //check telegram secretToken
     let token = req.get('x-telegram-bot-api-secret-token');
     //key empty
     if (!token) return next(errGen(400, 'token required'));
     //key invalid
     if (token != config.secretToken) return next(errGen(401, 'invalid token'))
 
+    // 需要进一步鉴权：
     next();
 })
 
@@ -31,6 +32,8 @@ teleWebhook.use(express.json())
 teleWebhook.use('/', function (req, res) {
     console.log(req.body); // for test
     res.send(req.body); // for test, no need to response anything.
+
+
     });
 
 teleWebhook.listen(config.port, () => 
