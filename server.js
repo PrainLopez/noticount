@@ -36,7 +36,7 @@ teleWebhook.use('/', function (req, res) {
         msg.upd_id = req.body.update_id;
         msg.user_id = req.body.message.from.id;
         msg.user_name = req.body.message.from.username;
-        msg.time = req.body.message.date;
+        msg.date = req.body.message.date;
         msg.text = req.body.message.text;
     }
     else{
