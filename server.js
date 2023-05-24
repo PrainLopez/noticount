@@ -13,7 +13,7 @@ function errGen(status, msg){
 
 // Authenticate secrest token
 teleWebhook.use('/', function(req, res, next) {
-    console.log('Authenticating...')
+    console.log('Authenticating...') // TODO: 测试用
     //check telegram secretToken
     let token = req.get('x-telegram-bot-api-secret-token');
     //key empty
@@ -30,11 +30,8 @@ teleWebhook.use(express.json())
 
 // Receive message from Telegram
 teleWebhook.use('/', function (req, res) {
-    console.log(req.body); // for test
-    res.send(req.body); // for test, no need to response anything.
-
     msg = req.body.message;
-
+    res.send(msg); // TODO: 测试用
     });
 
 teleWebhook.listen(config.port, () => 
