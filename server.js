@@ -1,6 +1,6 @@
 // 这里更像一个主程序而非功能模块
 const express = require('express');
-const config = require('../config');
+const config = require('./config.json');
 
 const teleWebhook = express();
 
@@ -33,6 +33,7 @@ teleWebhook.use('/', function (req, res) {
     console.log(req.body); // for test
     res.send(req.body); // for test, no need to response anything.
 
+    msg = req.body.message;
 
     });
 
