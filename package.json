@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "a node.js web service for automate accounting via chatGPT, Telegram bot and Notion.",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
