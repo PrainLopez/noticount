@@ -6,11 +6,8 @@
   "type": "module",
   "scripts": {
     "compile": "tsc",
-    "test": "tsc && nodemon src/server.js",
+    "dev": "tsc -w & nodemon dist/server.js",
     "start": "echo \"no start!\" && exit 1",
-    "testTele": "tsc && nodemon dist/teleRecv.js",
-    "testGPT": "tsc && nodemon dist/gptParse.js",
-    "testNotion": "tsc && nodemon dist/notionWrite.js"
   },
   "repository": {
     "type": "git",
