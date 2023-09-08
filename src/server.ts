@@ -1,18 +1,26 @@
-import express, {Express, Request, Response} from "express";
+import express, {Express, NextFunction, Request, Response} from "express";
+import config from '../config.json' assert {type: "json"};
 
-const app: Express = express();
+const listener = express();
 
 interface LangInReq extends Request {
     recvTime: number;
 }
 
-app.use('/recv', (req: LangInReq) => {
+listener.use('/recv', (req: LangInReq, res: Response, next: NextFunction) => {
     req.recvTime = Date.now();
+    
+    let token = req.get('x-telegram-bot-api-secret-token');
+    if(token !== config.telegram.botToken) {
+        console.log(`[WARN] Unauthorized request from ${req.ip} with token ${token}`);
+        return;
+    }
+
+    next();
 })
 
-app.use(express.json());
+listener.use(express.json());
 
-app.use('/recv', (req: Request, res: Response) => {
-    let recvTime: number = Date.now();
-
+listener.use('/recv', (req: LangInReq) => {
+    
 })
