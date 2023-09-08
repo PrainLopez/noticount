@@ -21,6 +21,8 @@ src/server.ts:10:23 - error TS2769: No overload matches this call.
     185     (path: PathParams, subApplication: Application): T;
             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     The last overload is declared here.
+
+    https://stackoverflow.com/questions/71243903/accessing-middleware-injected-data-in-typescript
 */
     req.recvTime = Date.now();
     
@@ -35,6 +37,6 @@ src/server.ts:10:23 - error TS2769: No overload matches this call.
 
 listener.use(express.json());
 
-listener.use('/recv', (req: LangInReq) => {
+listener.use('/recv', (req, res, next) => {
     
 })
