@@ -2,6 +2,8 @@
   "extends": "@tsconfig/node18/tsconfig.json",
   "include": ["*.ts", "src/*.ts"],
 
+  "typeRoots": ["./node_modules/@types", "./types"],
+
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
