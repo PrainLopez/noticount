@@ -5,8 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "compile": "tsc",
-    "dev": "nodemon dist/src/server.js & tsc -w",
+    "compile": "tsc -w",
+    "dev": "nodemon dist/src/server.js",
     "start": "echo \"no start!\" && exit 1"
   },
   "repository": {
@@ -27,6 +27,7 @@
     "@types/express": "^4.17.17",
     "@types/node": "^20.6.0",
     "nodemon": "^3.0.1",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   }
 }
