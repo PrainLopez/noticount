@@ -1,0 +1,8 @@
+{
+    "port": 3000,
+
+    "telegramBotListener":{
+        "enable": true,
+        "botToken": "YOUR_BOT_TOKEN"
+    }
+}
