@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "compile": "tsc",
-    "dev": "tsc -w & nodemon dist/server.js",
+    "dev": "nodemon dist/src/server.js & tsc -w",
     "start": "echo \"no start!\" && exit 1"
   },
   "repository": {

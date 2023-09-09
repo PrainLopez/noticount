@@ -14,10 +14,14 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
     }
 
     next();
-})
+});
 
 listener.use(express.json());
 
 listener.use('/recv', (req, res, next) => {
     
-})
+});
+
+listener.listen(config.port, () => {
+  console.log(`[INFO] Listening on port ${config.port}`);
+});
