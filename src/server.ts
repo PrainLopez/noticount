@@ -16,14 +16,14 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
   const recvTime = Date.now();
 
   if (config.telegramBotListener.enable == true 
-    || config.telegramBotListener.botToken == req.get('x-telegram-bot-api-secret-token')) {
+    || config.telegramBotListener.botToken == req.get('X-Telegram-Bot-Api-Secret-Token')) {
       
       class RecvTelegramBotSession implements AbstractAccountingSession {
         naturalLanguageText: string | undefined;
         inTime: number | undefined;
 
-        constructor(res: Response, recvTime: number) {
-          this.naturalLanguageText = undefined; // TODO: Extract natural language text from request
+        constructor(req: Request, recvTime: number) {
+          this.naturalLanguageText = req.body.message.text;
           this.inTime = recvTime;
         }
 
@@ -37,6 +37,15 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
           });
         }
       }
+
+      const session = new RecvTelegramBotSession(req, recvTime);
+      session.process()
+        .then((session) => {
+          // TODO: Next process
+        })
+        .catch((error) => {
+          // TODO: Handle error
+        });
     }
 
   next();
