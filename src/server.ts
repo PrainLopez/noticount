@@ -17,6 +17,8 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
 
   if (config.telegramBotListener.enable == true 
     || config.telegramBotListener.botToken == req.get('X-Telegram-Bot-Api-Secret-Token')) {
+
+      // TODO: Implement further authorization
       
       class RecvTelegramBotSession implements AbstractAccountingSession {
         naturalLanguageText: string | undefined;
