@@ -10,11 +10,13 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
   const recvTime = Date.now()
 
   if (
-    config.telegramBotListener.enable == true ||
-    config.telegramBotListener.botToken ==
+    config.listener.telegramBotListener.enable == true ||
+    config.listener.telegramBotListener.botToken ==
       req.get('X-Telegram-Bot-Api-Secret-Token')
   ) {
     // TODO: Implement further authorization
+
+    console.log(`[INFO] Received validated message from Telegram Bot`);
 
     class RecvTelegramBotSession implements AbstractAccountingSession {
       naturalLanguageText: string | undefined;
