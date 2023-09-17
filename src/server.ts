@@ -1,12 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express'
 import config from '../config.json' assert { type: 'json' }
-
-interface AbstractAccountingSession {
-  naturalLanguageText: string | undefined
-  inTime: number | undefined
-
-  process(): Promise<AbstractAccountingSession>
-}
+import { AbstractAccountingSession } from '../types/interfaces.js'
 
 const listener = express()
 
@@ -23,8 +17,10 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
     // TODO: Implement further authorization
 
     class RecvTelegramBotSession implements AbstractAccountingSession {
-      naturalLanguageText: string | undefined
-      inTime: number | undefined
+      naturalLanguageText: string | undefined;
+      inTime: number | undefined;
+      recordEvent: undefined;
+      recordAmount: undefined;
 
       constructor (req: Request, recvTime: number) {
         this.naturalLanguageText = req.body.message.text
@@ -32,13 +28,7 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
       }
 
       async process (): Promise<AbstractAccountingSession> {
-        return new Promise((resolve, reject) => {
-          try {
-            resolve(this)
-          } catch (error) {
-            reject(error)
-          }
-        })
+        return this;
       }
     }
 
@@ -51,9 +41,9 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
       .catch(error => {
         // TODO: Handle error
       })
+  } else {
+    next();
   }
-
-  next()
 })
 
 listener.listen(config.port, () => {
