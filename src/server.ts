@@ -48,6 +48,12 @@ listener.use('/recv', (req: Request, res: Response, next: NextFunction) => {
   }
 })
 
+// final handler, 404
+listener.use((req: Request, res: Response) => {
+  res.status(404).send('404 Not Found');
+  console.log(`[ERROR] Received unhandled message from ${req.ip}`);
+})
+
 listener.listen(config.port, () => {
   console.log(`[INFO] Listening on port ${config.port}`)
 })
