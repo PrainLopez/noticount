@@ -1,8 +1,8 @@
 export interface AbstractAccountingSession {
-  naturalLanguageText: string | undefined;
-  inTime: number | undefined;
-  recordEvent: string | undefined;
-  recordAmount: number | undefined;
+  naturalLanguageText: string | null;
+  inTime: number | null;
+  recordEvent: string | null;
+  recordAmount: number | null;
 
   process(): Promise<AbstractAccountingSession>;
 }
