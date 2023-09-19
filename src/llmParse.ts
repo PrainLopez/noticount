@@ -7,7 +7,7 @@ abstract class AbstractParser implements AbstractAccountingSession {
   inTime: number | null
   recordEvent: string | null
   recordAmount: number | null
-  nextParser: AbstractAccountingSession | null
+  abstract nextParser: AbstractAccountingSession | null
 
   constructor(
     session: AbstractAccountingSession,
@@ -17,7 +17,6 @@ abstract class AbstractParser implements AbstractAccountingSession {
     this.inTime = session.inTime
     this.recordEvent = session.recordEvent
     this.recordAmount = session.recordAmount
-    this.nextParser = nextParser
   }
 
   abstract process(): Promise<AbstractAccountingSession>;
@@ -31,7 +30,7 @@ export async function parser(
   }
 
   // chain of responsibility construction part
-  // add new parser here
+  // add new parser and chain next parser here
   const gptParser = new ChatGPTParser(session);
 
   // chain of responsibility execution part
@@ -39,6 +38,8 @@ export async function parser(
 }
 
 class ChatGPTParser extends AbstractParser {
+  nextParser: AbstractAccountingSession | null = null;
+
   async process(): Promise<AbstractAccountingSession> {
     if (config.parser.use == "chatGPT") {
       try {
@@ -47,22 +48,22 @@ class ChatGPTParser extends AbstractParser {
         })
 
         const response = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: "gpt-3.5-turbo",
           messages: [
             {
-              role: 'system',
-              content: config.parser.chatGPT.system_message
+              role: "system",
+              content: config.parser.chatGPT.system_message,
             },
             {
-              role: 'user',
-              content: this.naturalLanguageText
-            }
+              role: "user",
+              content: this.naturalLanguageText,
+            },
           ],
           temperature: config.parser.chatGPT.temperature,
           max_tokens: config.parser.chatGPT.max_tokens,
           top_p: config.parser.chatGPT.top_p,
           frequency_penalty: config.parser.chatGPT.frequency_penalty,
-          presence_penalty: config.parser.chatGPT.presence_penalty
+          presence_penalty: config.parser.chatGPT.presence_penalty,
         });
 
         const record: string = response.choices.at(-1)?.message.content as string;
@@ -73,7 +74,7 @@ class ChatGPTParser extends AbstractParser {
       catch (error) {
         throw new Error(`[ERROR] ChatGPTParser: ${error}`);
       }
-      
+
       return this;
     }
     else {
