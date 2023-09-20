@@ -1,4 +1,5 @@
 import express, { Express, NextFunction, Request, Response } from "express";
+import { parser } from "./llmParse.js";
 import config from "../config.json" assert { type: "json" };
 import { AbstractAccountingSession } from "../types/interfaces.js";
 
@@ -6,11 +7,11 @@ const listener = express();
 
 listener.use(express.json());
 
-listener.use("/recv", (req: Request, res: Response, next: NextFunction) => {
+listener.use("/recv", async (req: Request, res: Response, next: NextFunction) => {
   const recvTime = Date.now();
 
   if (
-    config.listener.telegramBotListener.enable == true ||
+    config.listener.telegramBotListener.enable == true &&
     config.listener.telegramBotListener.botToken ==
       req.get("X-Telegram-Bot-Api-Secret-Token")
   ) {
@@ -33,16 +34,19 @@ listener.use("/recv", (req: Request, res: Response, next: NextFunction) => {
         return this;
       }
     }
-
-    const session = new RecvTelegramBotSession(req, recvTime);
-    session
-      .process()
-      .then((session) => {
-        // TODO: Next process
-      })
-      .catch((error) => {
-        // TODO: Handle error
-      });
+    
+    if (req.body.message.text === undefined) {
+      console.log(`[ERROR] message from Telegram Bot is invalid.`);
+    }
+    try {
+      const session = new RecvTelegramBotSession(req, recvTime);
+      await session.process();
+      parser(session);
+      console.log(`[INFO] Parsed message from Telegram Bot ${session.recordEvent}, ${session.recordAmount}`);//FIXME: test
+    }
+    catch (error) {
+      console.log(error);
+    }
   } else {
     next();
   }
