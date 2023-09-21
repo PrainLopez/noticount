@@ -1,5 +1,5 @@
-import config from '../config.json' assert { type: 'json' }
 import OpenAI from 'openai'
+import { AbstractAccountingSession } from '../types/interfaces.js';
 
 import config from "../config.json" assert { type: "json" };
 
@@ -40,12 +40,13 @@ export async function parser(
 
 class ChatGPTParser extends AbstractParser {
   nextParser: AbstractAccountingSession | null = null;
+  apiKey: string = config.parser.chatGPT.apiKey;
 
   async process(): Promise<AbstractAccountingSession> {
     if (config.parser.use == "chatGPT") {
       try {
         const openai = new OpenAI({
-          apiKey: config.parser.chatGPT.apiKey
+          apiKey: this.apiKey
         })
 
         const response = await openai.chat.completions.create({
