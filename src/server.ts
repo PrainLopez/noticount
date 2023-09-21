@@ -1,7 +1,8 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import { parser } from "./llmParse.js";
-import config from "../config.json" assert { type: "json" };
 import { AbstractAccountingSession } from "../types/interfaces.js";
+
+import config from "../config.json" assert { type: "json" };
 
 const listener = express();
 
