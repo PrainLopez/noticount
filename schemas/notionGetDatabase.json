@@ -1,0 +1,26 @@
+{
+    "object": "database",
+    "id": "329bc095-c8ec-4231-a90f-b2c08daa4040",
+    "properties": {
+        "Date": {
+            "id": "%5B%40W%5B",
+            "name": "Date",
+            "type": "created_time",
+            "created_time": {}
+        },
+        "Amount": {
+            "id": "hsZI",
+            "name": "Amount",
+            "type": "number",
+            "number": {
+                "format": "number"
+            }
+        },
+        "Event": {
+            "id": "title",
+            "name": "Event",
+            "type": "title",
+            "title": {}
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "parent": {
+        "type": "database_id",
+        "database_id": "329bc095c8ec4231a90fb2c08daa4040"
+    },
+    "properties": {
+        "Amount": {
+            "type": "number",
+            "number": "3.15"
+        },
+        "Event": {
+            "type": "title",
+            "title": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": "session-recordEvent",
+                        "link": null
+                    },
+                    "annotations": {
+                        "bold": false,
+                        "italic": false,
+                        "strikethrough": false,
+                        "underline": false,
+                        "code": false,
+                        "color": "default"
+                    }
+                }
+            ]
+        }
+    }
+}
