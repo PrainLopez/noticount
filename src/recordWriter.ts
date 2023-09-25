@@ -1,7 +1,12 @@
+import { EventEmitter } from "stream";
 import { AbstractAccountingSession } from "../types/interfaces.js";
+import { Client } from "@notionhq/client";
 
-import { config } from "process";
+import config from "../config.json" assert { type: "json" };
 
+const writeEvent = new EventEmitter();
+
+/* 
 abstract class AbstractWriter implements AbstractAccountingSession {
     naturalLanguageText: string | null
     inTime: number | null
@@ -21,5 +26,46 @@ abstract class AbstractWriter implements AbstractAccountingSession {
     
     abstract process(): Promise<AbstractAccountingSession>;
 }
+ */
 
-export function writer (session: AbstractAccountingSession): void {}
+export function writer(session: AbstractAccountingSession): void {
+    writeEvent.emit('write', session);
+}
+
+// Notion database writer
+writeEvent.on('write', async (session: AbstractAccountingSession) => {
+    const notion = new Client({ auth: config.writer.notion.apiKey });
+
+    const response = await notion.pages.create({
+        "parent": {
+            "type": "database_id",
+            "database_id": config.writer.notion.databaseId
+        },
+        "properties": {
+            "Amount": {
+                "type": "number",
+                "number": session.recordAmount
+            },
+            "Event": {
+                "type": "title",
+                "title": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": session.recordEvent as string,
+                            "link": null
+                        },
+                        "annotations": {
+                            "bold": false,
+                            "italic": false,
+                            "strikethrough": false,
+                            "underline": false,
+                            "code": false,
+                            "color": "default"
+                        }
+                    }
+                ]
+            }
+        },
+    })
+});
