@@ -68,4 +68,6 @@ writeEvent.on('write', async (session: InterfaceAccountingSession) => {
             }
         },
     })
+
+    return response;
 });
