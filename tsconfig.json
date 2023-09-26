@@ -1,6 +1,6 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
-  "include": ["*.ts", "src/*.ts"],
+  "include": ["*.ts", "src/*.ts", "test/*.ts"],
 
   "typeRoots": ["./node_modules/@types", "./types"],
 
