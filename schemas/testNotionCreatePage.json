@@ -6,7 +6,7 @@
     "properties": {
         "Amount": {
             "type": "number",
-            "number": "3.15"
+            "number": "3.1"
         },
         "Event": {
             "type": "title",

@@ -1,18 +1,18 @@
 import OpenAI from 'openai'
-import { AbstractAccountingSession } from '../types/interfaces.js';
+import { InterfaceAccountingSession } from '../types/interfaces.js';
 
 import config from "../config.json" assert { type: "json" };
 
-abstract class AbstractParser implements AbstractAccountingSession {
+abstract class AbstractParser implements InterfaceAccountingSession {
   naturalLanguageText: string | null
   inTime: number | null
   recordEvent: string | null
   recordAmount: number | null
-  abstract nextParser: AbstractAccountingSession | null
+  abstract nextParser: InterfaceAccountingSession | null
 
   constructor(
-    session: AbstractAccountingSession,
-    nextParser: AbstractAccountingSession | null = null
+    session: InterfaceAccountingSession,
+    nextParser: InterfaceAccountingSession | null = null
   ) {
     this.naturalLanguageText = session.naturalLanguageText
     this.inTime = session.inTime
@@ -20,12 +20,12 @@ abstract class AbstractParser implements AbstractAccountingSession {
     this.recordAmount = session.recordAmount
   }
 
-  abstract process(): Promise<AbstractAccountingSession>;
+  abstract process(): Promise<InterfaceAccountingSession>;
 }
 
 export async function parser(
-  session: AbstractAccountingSession
-): Promise<AbstractAccountingSession> {
+  session: InterfaceAccountingSession
+): Promise<InterfaceAccountingSession> {
   if (session.naturalLanguageText === null) {
     throw new Error('Natural language text is null')
   }
@@ -39,10 +39,10 @@ export async function parser(
 }
 
 class ChatGPTParser extends AbstractParser {
-  nextParser: AbstractAccountingSession | null = null;
+  nextParser: InterfaceAccountingSession | null = null;
   apiKey: string = config.parser.chatGPT.apiKey;
 
-  async process(): Promise<AbstractAccountingSession> {
+  async process(): Promise<InterfaceAccountingSession> {
     if (config.parser.use == "chatGPT") {
       try {
         const openai = new OpenAI({

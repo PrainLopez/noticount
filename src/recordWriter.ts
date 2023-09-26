@@ -1,5 +1,5 @@
 import { EventEmitter } from "stream";
-import { AbstractAccountingSession } from "../types/interfaces.js";
+import { InterfaceAccountingSession } from "../types/interfaces.js";
 import { Client } from "@notionhq/client";
 
 import config from "../config.json" assert { type: "json" };
@@ -28,12 +28,12 @@ abstract class AbstractWriter implements AbstractAccountingSession {
 }
  */
 
-export function writer(session: AbstractAccountingSession): void {
+export function writer(session: InterfaceAccountingSession): void {
     writeEvent.emit('write', session);
 }
 
 // Notion database writer
-writeEvent.on('write', async (session: AbstractAccountingSession) => {
+writeEvent.on('write', async (session: InterfaceAccountingSession) => {
     const notion = new Client({ auth: config.writer.notion.apiKey });
 
     const response = await notion.pages.create({

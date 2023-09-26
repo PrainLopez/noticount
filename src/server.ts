@@ -1,6 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import { parser } from "./llmParse.js";
-import { AbstractAccountingSession } from "../types/interfaces.js";
+import { InterfaceAccountingSession } from "../types/interfaces.js";
 
 import config from "../config.json" assert { type: "json" };
 
@@ -20,7 +20,7 @@ listener.use("/recv", async (req: Request, res: Response, next: NextFunction) =>
 
     console.log(`[INFO] Received validated message from Telegram Bot`);
 
-    class RecvTelegramBotSession implements AbstractAccountingSession {
+    class RecvTelegramBotSession implements InterfaceAccountingSession {
       naturalLanguageText: string | null;
       inTime: number | null;
       recordEvent = null;
@@ -31,7 +31,7 @@ listener.use("/recv", async (req: Request, res: Response, next: NextFunction) =>
         this.inTime = recvTime;
       }
 
-      async process(): Promise<AbstractAccountingSession> {
+      async process(): Promise<InterfaceAccountingSession> {
         return this;
       }
     }
