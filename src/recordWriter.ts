@@ -1,4 +1,4 @@
-import { EventEmitter } from "stream";
+import { EventEmitter } from "node:events";
 import { InterfaceAccountingSession } from "../types/interfaces.js";
 import { Client } from "@notionhq/client";
 
