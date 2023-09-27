@@ -3,6 +3,7 @@ import { InterfaceAccountingSession } from "../types/interfaces.js";
 import { Client } from "@notionhq/client";
 
 import config from "../config.json" assert { type: "json" };
+import databaseSchema from "../schemas/notionGetDatabase.json" assert { type: "json" };
 
 const writeEvent = new EventEmitter();
 
@@ -38,35 +39,9 @@ writeEvent.on('write', async (session: InterfaceAccountingSession) => {
 
     const response = await notion.pages.create({
         "parent": {
-            "type": "database_id",
             "database_id": config.writer.notion.databaseId
         },
-        "properties": {
-            "Amount": {
-                "type": "number",
-                "number": session.recordAmount
-            },
-            "Event": {
-                "type": "title",
-                "title": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": session.recordEvent as string,
-                            "link": null
-                        },
-                        "annotations": {
-                            "bold": false,
-                            "italic": false,
-                            "strikethrough": false,
-                            "underline": false,
-                            "code": false,
-                            "color": "default"
-                        }
-                    }
-                ]
-            }
-        },
+        "properties": config.writer.notion.databaseSchema
     })
 
     return response;

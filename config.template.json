@@ -26,7 +26,29 @@
     "writer": {
         "notion": {
             "apiKey": "NOTION_API_KEY",
-            "databaseId": "NOTION_DATABASE_ID"
+            "databaseId": "NOTION_DATABASE_ID",
+            "databaseSchema": {
+                "Date": {
+                    "id": "SOME_ID",
+                    "name": "Date",
+                    "type": "created_time",
+                    "created_time": {}
+                },
+                "Amount": {
+                    "id": "SOME_ID",
+                    "name": "Amount",
+                    "type": "number",
+                    "number": {
+                        "format": "number"
+                    }
+                },
+                "Event": {
+                    "id": "title",
+                    "name": "Event",
+                    "type": "title",
+                    "title": {}
+                }
+            }
         }
     }
 }
