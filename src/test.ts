@@ -27,14 +27,14 @@ class TestSession implements InterfaceAccountingSession {
 
 // test llmParse.ts
 async function testParser() {
-  const sessionParser = new TestSession(
+  let sessionParser: InterfaceAccountingSession = new TestSession(
     "傻逼百事要我4块钱",
     Date.now(),
     null,
     null
   );
   try {
-    await parser(sessionParser);
+    sessionParser = await parser(sessionParser);
     console.log(
       `[INFO] LLM Parsed message from TEST ${sessionParser.recordEvent}, ${sessionParser.recordAmount}`
     );
@@ -45,7 +45,7 @@ async function testParser() {
 
 // test recordWriter.ts
 async function testWriter() {
-  const sessionWriter = new TestSession(
+  let sessionWriter: InterfaceAccountingSession = new TestSession(
     "傻逼百事要我4块钱",
     Date.now(),
     "百事",

@@ -68,11 +68,10 @@ class ChatGPTParser extends AbstractParser {
         });
 
         let record: string = response.choices.at(-1)?.message.content as string;
-        record.replace(/[\r\n]/g, " ");
+        record.replace(/[\r\n]+/g, ' ');
         const recordObject = JSON.parse(record);
-        console.log(`[INFO] ChatGPTParser: ${recordObject}\n ${record}`);
-        this.recordEvent = recordObject.Event;
-        this.recordAmount = recordObject.Amount;
+        this.recordEvent = recordObject.event;
+        this.recordAmount = recordObject.amount;
       }
       catch (error) {
         throw new Error(`[ERROR] ChatGPTParser: ${error}`);
