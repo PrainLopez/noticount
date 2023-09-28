@@ -42,8 +42,11 @@ writeEvent.on('write', async (session: InterfaceAccountingSession) => {
         "parent": {
             "database_id": config.writer.notion.databaseId
         },
+        // @ts-ignore
         "properties": properties
     })
 
-    return response;
+    if (response.id === undefined) {
+        throw new Error(`[ERROR] Notion database writer error \n${response}`);
+    }
 });
