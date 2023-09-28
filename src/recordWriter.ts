@@ -3,7 +3,6 @@ import { InterfaceAccountingSession } from "../types/interfaces.js";
 import { Client } from "@notionhq/client";
 
 import config from "../config.json" assert { type: "json" };
-import databaseSchema from "../schemas/notionGetDatabase.json" assert { type: "json" };
 
 const writeEvent = new EventEmitter();
 
@@ -37,11 +36,13 @@ export function writer(session: InterfaceAccountingSession): void {
 writeEvent.on('write', async (session: InterfaceAccountingSession) => {
     const notion = new Client({ auth: config.writer.notion.apiKey });
 
+    const properties = config.writer.notion.databaseSchema;
+    properties.Event.title[0].text.content = session.recordEvent as string;
     const response = await notion.pages.create({
         "parent": {
             "database_id": config.writer.notion.databaseId
         },
-        "properties": config.writer.notion.databaseSchema
+        "properties": properties
     })
 
     return response;
