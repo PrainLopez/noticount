@@ -3,6 +3,7 @@ import { parser } from "./llmParse.js";
 import { InterfaceAccountingSession } from "../types/interfaces.js";
 
 import config from "../config.json" assert { type: "json" };
+import { writer } from "./recordWriter.js";
 
 const listener = express();
 
@@ -39,15 +40,17 @@ listener.use("/recv", async (req: Request, res: Response, next: NextFunction) =>
     if (req.body.message.text === undefined) {
       console.log(`[ERROR] message from Telegram Bot is invalid.`);
     }
+
+    const session = new RecvTelegramBotSession(req, recvTime);
     try {
-      const session = new RecvTelegramBotSession(req, recvTime);
       await session.process();
-      parser(session);
-      console.log(`[INFO] Parsed message from Telegram Bot ${session.recordEvent}, ${session.recordAmount}`);//FIXME: test
+      await parser(session);
+      writer(session);
     }
     catch (error) {
       console.log(error);
     }
+    
   } else {
     next();
   }

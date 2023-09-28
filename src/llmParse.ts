@@ -23,9 +23,7 @@ abstract class AbstractParser implements InterfaceAccountingSession {
   abstract process(): Promise<InterfaceAccountingSession>;
 }
 
-export async function parser(
-  session: InterfaceAccountingSession
-): Promise<InterfaceAccountingSession> {
+export async function parser(session: InterfaceAccountingSession): Promise<InterfaceAccountingSession> {
   if (session.naturalLanguageText === null) {
     throw new Error('Natural language text is null')
   }
@@ -33,6 +31,7 @@ export async function parser(
   // chain of responsibility construction part
   // add new parser and chain next parser here
   const gptParser = new ChatGPTParser(session);
+  gptParser.nextParser = null;
 
   // chain of responsibility execution part
   return await gptParser.process();
@@ -68,10 +67,12 @@ class ChatGPTParser extends AbstractParser {
           presence_penalty: config.parser.chatGPT.presence_penalty,
         });
 
-        const record: string = response.choices.at(-1)?.message.content as string;
-        const recordObject = JSON.parse(record) as { recordEvent: string, recordAmount: number };
-        this.recordEvent = recordObject.recordEvent;
-        this.recordAmount = recordObject.recordAmount;
+        let record: string = response.choices.at(-1)?.message.content as string;
+        record.replace(/[\r\n]/g, " ");
+        const recordObject = JSON.parse(record);
+        console.log(`[INFO] ChatGPTParser: ${recordObject}\n ${record}`);
+        this.recordEvent = recordObject.Event;
+        this.recordAmount = recordObject.Amount;
       }
       catch (error) {
         throw new Error(`[ERROR] ChatGPTParser: ${error}`);
