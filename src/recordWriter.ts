@@ -38,6 +38,7 @@ writeEvent.on('write', async (session: InterfaceAccountingSession) => {
 
     const properties = config.writer.notion.databaseSchema;
     properties.Event.title[0].text.content = session.recordEvent as string;
+    properties.Amount.number = session.recordAmount as number;
     const response = await notion.pages.create({
         "parent": {
             "database_id": config.writer.notion.databaseId

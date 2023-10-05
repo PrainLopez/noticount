@@ -48,7 +48,7 @@ async function testWriter() {
   let sessionWriter: InterfaceAccountingSession = new TestSession(
     "傻逼百事要我4块钱",
     Date.now(),
-    "百事",
+    "可乐",
     4
   );
   try {
