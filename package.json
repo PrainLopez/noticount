@@ -2,12 +2,13 @@
   "name": "noticount",
   "version": "0.1.0",
   "description": "a node.js web service for automate accounting via chatGPT, Telegram bot and Notion.",
-  "main": "server.js",
+  "main": "dist/src/server.js",
   "type": "module",
   "scripts": {
     "compile": "tsc -w",
     "dev": "nodemon dist/src/server.js",
-    "start": "echo \"no start!\" && exit 1"
+    "start": "node dist/src/server.js",
+    "test": "node dist/src/test.js"
   },
   "repository": {
     "type": "git",
