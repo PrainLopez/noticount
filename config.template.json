@@ -1,16 +1,13 @@
 {
     "port": 3000,
-    
     "listener": {
         "telegramBotListener": {
             "enable": false,
             "botToken": "YOUR_BOT_TOKEN"
         }
     },
-
-    "parser":{
-        "use": "chatGPT",  
-
+    "parser": {
+        "use": "chatGPT",
         "chatGPT": {
             "apiKey": "OPENAI_API_KEY",
             "model": "gpt-3.5-turbo",
@@ -22,31 +19,22 @@
             "system_message": "你是一个记账管理器，你负责将用户给你的自然语言解析成JSON格式，json schema如下：\n{\n\"event\": \"string\",\n\"amount\": \"number\"\n}\n回答中不要包含任何自然语言，只包含JSON内容。"
         }
     },
-    
     "writer": {
         "notion": {
             "apiKey": "NOTION_API_KEY",
             "databaseId": "NOTION_DATABASE_ID",
             "databaseSchema": {
-                "Date": {
-                    "id": "SOME_ID",
-                    "name": "Date",
-                    "type": "created_time",
-                    "created_time": {}
-                },
                 "Amount": {
-                    "id": "SOME_ID",
-                    "name": "Amount",
-                    "type": "number",
-                    "number": {
-                        "format": "number"
-                    }
+                    "number": 0
                 },
                 "Event": {
-                    "id": "title",
-                    "name": "Event",
-                    "type": "title",
-                    "title": {}
+                    "title": [
+                        {
+                            "text": {
+                                "content": "INSERT_CONTENT"
+                            }
+                        }
+                    ]
                 }
             }
         }
