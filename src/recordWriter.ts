@@ -34,6 +34,7 @@ export function writer(session: InterfaceAccountingSession): void {
 
 // Notion database writer
 writeEvent.on('write', async (session: InterfaceAccountingSession) => {
+    if(config.writer.notion.enable !== true) {return;}
     const notion = new Client({ auth: config.writer.notion.apiKey });
 
     const properties = config.writer.notion.databaseSchema;

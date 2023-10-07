@@ -21,6 +21,7 @@
     },
     "writer": {
         "notion": {
+            "enable": false,
             "apiKey": "NOTION_API_KEY",
             "databaseId": "NOTION_DATABASE_ID",
             "databaseSchema": {
