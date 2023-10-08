@@ -9,6 +9,7 @@ const listener = express();
 
 listener.use(express.json());
 
+// Telegram Bot Webhook Listener
 listener.use("/recv", async (req: Request, res: Response, next: NextFunction) => {
   const recvTime = Date.now();
 
@@ -55,6 +56,13 @@ listener.use("/recv", async (req: Request, res: Response, next: NextFunction) =>
     next();
   }
 });
+
+// Telegram Bot getUpdate
+if (config.listener.telegramBotUpdater.enable === true) {
+  setInterval(async () => {
+    
+  }, config.listener.telegramBotUpdater.interval)
+}
 
 // final handler, 404
 listener.use((req: Request, res: Response) => {

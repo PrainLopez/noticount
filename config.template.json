@@ -4,6 +4,11 @@
         "telegramBotListener": {
             "enable": false,
             "botToken": "YOUR_BOT_TOKEN"
+        },
+
+        "telegramBotUpdater": {
+            "enable": false,
+            "interval": 5000
         }
     },
     "parser": {
