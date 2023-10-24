@@ -16,9 +16,8 @@ listener.use("/recv", async (req: Request, res: Response, next: NextFunction) =>
   if (
     config.listener.telegramBotListener.enable == true &&
     config.listener.telegramBotListener.botToken ==
-      req.get("X-Telegram-Bot-Api-Secret-Token")
+    req.get("X-Telegram-Bot-Api-Secret-Token")
   ) {
-    // TODO: Implement further authorization
 
     console.log(`[INFO] Received validated message from Telegram Bot`);
 
@@ -37,21 +36,25 @@ listener.use("/recv", async (req: Request, res: Response, next: NextFunction) =>
         return this;
       }
     }
-    
+
     if (req.body.message.text === undefined) {
       console.log(`[ERROR] message from Telegram Bot is invalid.`);
+      res.status(400).send("400 Bad Request");
+    }
+    else {
+      res.status(200).send("200 OK");
+
+      const session = new RecvTelegramBotSession(req, recvTime);
+      try {
+        await session.process();
+        await parser(session);
+        writer(session);
+      }
+      catch (error) {
+        console.log(error);
+      }
     }
 
-    const session = new RecvTelegramBotSession(req, recvTime);
-    try {
-      await session.process();
-      await parser(session);
-      writer(session);
-    }
-    catch (error) {
-      console.log(error);
-    }
-    
   } else {
     next();
   }
