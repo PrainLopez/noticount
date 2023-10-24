@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc -w",
     "dev": "nodemon dist/src/server.js",
-    "start": "node dist/src/server.js",
+    "serve": "node dist/src/server.js",
     "test": "node dist/src/test.js"
   },
   "repository": {
