@@ -6,12 +6,12 @@ import config from "../config.json" assert { type: "json" };
 import { writer } from "./recordWriter.js";
 import TelegramBot from "node-telegram-bot-api";
 
-const listener = express();
-
 if (config.listener.telegramBotListener.enable === true) {
-  const bot = new TelegramBot(config.listener.telegramBotListener.botToken);
+  const bot = new TelegramBot(config.listener.telegramBotListener.botToken, { polling: false });
   bot.setWebHook(config.listener.telegramBotListener.webhookUrl);
 }
+
+const listener = express();
 
 listener.use(express.json());
 
