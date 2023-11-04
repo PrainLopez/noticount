@@ -9,6 +9,7 @@ import TelegramBot from "node-telegram-bot-api";
 if (config.listener.telegramBotListener.enable === true) {
   const bot = new TelegramBot(config.listener.telegramBotListener.botToken, { polling: false });
   bot.setWebHook(config.listener.telegramBotListener.webhookUrl);
+  console.log(`[INFO] Telegram Bot Webhook set to ${config.listener.telegramBotListener.webhookUrl}`);
 }
 
 const listener = express();
