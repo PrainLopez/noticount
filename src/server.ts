@@ -4,8 +4,14 @@ import { InterfaceAccountingSession } from "../types/interfaces.js";
 
 import config from "../config.json" assert { type: "json" };
 import { writer } from "./recordWriter.js";
+import TelegramBot from "node-telegram-bot-api";
 
 const listener = express();
+
+if (config.listener.telegramBotListener.enable === true) {
+  const bot = new TelegramBot(config.listener.telegramBotListener.botToken);
+  bot.setWebHook(config.listener.telegramBotListener.webhookUrl);
+}
 
 listener.use(express.json());
 

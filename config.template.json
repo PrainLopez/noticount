@@ -3,7 +3,8 @@
     "listener": {
         "telegramBotListener": {
             "enable": false,
-            "botToken": "YOUR_BOT_TOKEN"
+            "botToken": "YOUR_BOT_TOKEN",
+            "webhookUrl": "YOUR_WEBHOOK_URL"
         },
 
         "telegramBotUpdater": {
