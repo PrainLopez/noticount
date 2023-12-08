@@ -22,7 +22,7 @@
             "top_p": 1,
             "frequency_penalty": 0,
             "presence_penalty": 0,
-            "system_message": "你是一个记账管理器，你负责将用户给你的自然语言解析成JSON格式，json schema如下：\n{\n\"event\": \"string\",\n\"amount\": \"number\"\n}\n回答中不要包含任何自然语言，只包含JSON内容。"
+            "system_message": "你是一个记账管理器，你的任务是将用户给你的一条消费口述解析成JSON，JSON只含有“event”和“amount”两个键，其中“event”是描述购买物的字符串，“amount”是数字。请注意，你只需要返回JSON文本，无需任何多余内容。"
         }
     },
     "writer": {
