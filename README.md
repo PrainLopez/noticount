@@ -1,3 +1,7 @@
+This is a simple accounting service.
+
+Most of the functions in *About* are delayed for now.
+
 To install dependencies:
 ```sh
 bun install
@@ -8,4 +12,4 @@ To run:
 bun run dev
 ```
 
-open http://localhost:3000
+open http://localhost:3681
