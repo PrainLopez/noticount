@@ -1,21 +1,37 @@
-import { Hono } from 'hono'
-import { bearerAuth } from "hono/bearer-auth";
+import {Hono} from 'hono'
+import {bearerAuth} from "hono/bearer-auth";
 
 const token: string = process.env.BEARER_TOKEN as string;
 console.log("token", token) // TODO: comment this
 
-// Notion: Is this DTO?
-interface Record {
+// VO
+interface RecordVo {
+  amount: number;
+  remark?: string | null;
+}
+
+// DTO
+interface RecordDto {
   index: number;
   amount: number;
   remark?: string | null;
   timestamp: number;
 }
 
+function dtoAdapter(vo: RecordVo): RecordDto {
+  const { amount, remark } = vo
+  return {
+    index: table.length + 1,
+    amount,
+    remark,
+    timestamp: Date.now()
+  }
+}
+
 const bunFile = Bun.file('data_storage/prainy-account.json', { type: "application/json" })
-let table: Record[]
+let table: RecordDto[]
 if (await bunFile.exists()) {
-  table = await bunFile.json()
+  table = await bunFile.json() // this won't check redundant attributes, which will stripped by adapter.
   console.log(table)
 } else {
   table = []
@@ -34,15 +50,17 @@ app.get('/', (c) => {
 // TODO: Server-gen index
 // TODO: Server-gen timestamp
 app.post('/v1.0/Prainy/accounting', async (c) => {
-  let record: Record
+  let recordVo: RecordVo
   try {
-    record = await c.req.json()
+    recordVo = await c.req.json()
+    console.log(recordVo)
   } catch (err) {
     console.log(`Error while retrieving record.\n ${err}`)
     return c.text('unmatched record format!', 400)
   }
 
-  table.push(record)
+  const recordDto = dtoAdapter(recordVo)
+  table.push(recordDto)
   await Bun.write(bunFile, JSON.stringify(table))
 
   console.log(table)
