@@ -2,7 +2,7 @@ import {Hono} from 'hono'
 import {bearerAuth} from "hono/bearer-auth";
 
 const token: string = process.env.BEARER_TOKEN as string;
-console.log("token", token) // TODO: comment this
+// console.log("token", token)
 
 // VO
 interface RecordVo {
@@ -21,7 +21,7 @@ interface RecordDto {
 function dtoAdapter(vo: RecordVo): RecordDto {
   const { amount, remark } = vo
   return {
-    index: table.length + 1,
+    index: table.length + 1, // TODO: Is this safe?
     amount,
     remark,
     timestamp: Date.now()
@@ -32,7 +32,7 @@ const bunFile = Bun.file('data_storage/prainy-account.json', { type: "applicatio
 let table: RecordDto[]
 if (await bunFile.exists()) {
   table = await bunFile.json() // this won't check redundant attributes, which will stripped by adapter.
-  console.log(table)
+  // console.log(table)
 } else {
   table = []
   await Bun.write(bunFile, JSON.stringify(table))
@@ -41,19 +41,17 @@ if (await bunFile.exists()) {
 const app = new Hono()
 
 // '/'
-app.use('/', bearerAuth({ token }))
+app.use('/*', bearerAuth({ token }))
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
-// TODO: Server-gen index
-// TODO: Server-gen timestamp
 app.post('/v1.0/Prainy/accounting', async (c) => {
   let recordVo: RecordVo
   try {
     recordVo = await c.req.json()
-    console.log(recordVo)
+    // console.log(recordVo)
   } catch (err) {
     console.log(`Error while retrieving record.\n ${err}`)
     return c.text('unmatched record format!', 400)
@@ -63,9 +61,11 @@ app.post('/v1.0/Prainy/accounting', async (c) => {
   table.push(recordDto)
   await Bun.write(bunFile, JSON.stringify(table))
 
-  console.log(table)
+  // console.log(table)
   return c.text('OK', 200)
 })
+
+app.get('/v1.0/Prainy/monthly', async (c) => {})
 
 export default {
   port: 3681,
