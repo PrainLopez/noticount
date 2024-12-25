@@ -69,8 +69,25 @@ app.post('/v1.0/Prainy/accounting', async (c) => {
   return c.text(JSON.stringify(recordDto), 200)
 })
 
-app.get('/v1.0/Prainy/monthlySum', async (c) => {
-  // TODO：query month = YYYYMM, default to current month.
+// query: ?month=YYYYMM
+app.get('/v1.0/Prainy/monthRecords', async (c) => {
+  const now = new Date()
+  const queryMonth = c.req.query('month') ?? ""
+  const queryRequest = {
+    year: parseInt(queryMonth.slice(0, 4)) || now.getUTCFullYear(),
+    month: parseInt(queryMonth.slice(4)) || now.getUTCMonth() + 1
+  }
+  
+  const queryRecords = table.filter((record) => {
+    const date = new Date(record.timestamp)
+    return date.getUTCFullYear() == queryRequest.year && date.getUTCMonth() + 1 == queryRequest.month
+  })
+  
+  const responseText = {
+    request: queryRequest,
+    records: queryRecords
+  }
+  return c.text(JSON.stringify(responseText), 200)
 })
 
 export default {
