@@ -20,9 +20,12 @@ interface RecordDto {
 
 function dtoAdapter(vo: RecordVo): RecordDto {
   const { amount, remark } = vo
+  if (amount < 0) {
+    throw new Error('Amount must be greater than 0');
+  }
   return {
     index: table.length + 1, // TODO: Is this safe?
-    amount,
+    amount: Math.ceil(amount * 100) / 100,
     remark,
     timestamp: Date.now()
   }
@@ -49,23 +52,26 @@ app.get('/', (c) => {
 
 app.post('/v1.0/Prainy/accounting', async (c) => {
   let recordVo: RecordVo
+  let recordDto: RecordDto
   try {
     recordVo = await c.req.json()
     // console.log(recordVo)
+    recordDto = dtoAdapter(recordVo)
   } catch (err) {
     console.log(`Error while retrieving record.\n ${err}`)
-    return c.text('unmatched record format!', 400)
+    return c.text('Invalid record!', 400)
   }
 
-  const recordDto = dtoAdapter(recordVo)
   table.push(recordDto)
   await Bun.write(bunFile, JSON.stringify(table))
 
   // console.log(table)
-  return c.text('OK', 200)
+  return c.text(JSON.stringify(recordDto), 200)
 })
 
-app.get('/v1.0/Prainy/monthly', async (c) => {})
+app.get('/v1.0/Prainy/monthlySum', async (c) => {
+  // TODO：query month = YYYYMM, default to current month.
+})
 
 export default {
   port: 3681,
