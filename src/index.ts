@@ -1,7 +1,8 @@
 import {Hono} from 'hono'
 import {bearerAuth} from "hono/bearer-auth";
+import {prettyJSON} from "hono/pretty-json";
 
-const token: string = process.env.BEARER_TOKEN as string;
+const bearerToken: string = process.env.BEARER_TOKEN as string;
 // console.log("token", token)
 
 // VO
@@ -43,8 +44,10 @@ if (await bunFile.exists()) {
 
 const app = new Hono()
 
-// '/'
-app.use('/*', bearerAuth({ token }))
+app.use(prettyJSON())
+
+// Auth
+app.use('/*', bearerAuth({token: bearerToken}))
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')
@@ -66,7 +69,7 @@ app.post('/v1.0/Prainy/accounting', async (c) => {
   await Bun.write(bunFile, JSON.stringify(table))
 
   // console.log(table)
-  return c.text(JSON.stringify(recordDto), 200)
+  return c.json(recordDto)
 })
 
 // query: ?month=YYYYMM
@@ -87,7 +90,7 @@ app.get('/v1.0/Prainy/monthRecords', async (c) => {
     request: queryRequest,
     records: queryRecords
   }
-  return c.text(JSON.stringify(responseText), 200)
+  return c.json(responseText)
 })
 
 export default {
