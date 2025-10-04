@@ -1,15 +1,14 @@
 "use client";
 
-import { ToggleGroupItem } from "@radix-ui/react-toggle-group";
 import { ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ToggleGroup } from "@/components/ui/toggle-group";
 
 const currency = ["GBP", "USD", "EUR", "CNY"];
 
@@ -70,29 +69,16 @@ export default function AccountInput() {
       </CardContent>
       <CardFooter>
         <div className="w-full flex flex-row justify-between">
-          <ToggleGroup
-            variant="outline"
-            type="single"
-            value={transactionType}
-            onValueChange={(value: string) => {
-              if (value)
-                setTransactionType(value);
-            }}
-          >
-            <ToggleGroupItem
-              className="h-4 w-20"
-              value="daily"
-              aria-label="Daily"
-            >Daily
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              className="h-4 w-20"
-              value="special"
-              aria-label="Special"
-            >Special
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <Button className="w-fit">Submit Record</Button>
+          <ButtonGroup>
+            <Button variant={transactionType === "daily" ? "default" : "secondary"} size="sm" className="px-4" onClick={() => setTransactionType("daily")}>
+              Daily
+            </Button>
+            <ButtonGroupSeparator />
+            <Button variant={transactionType === "special" ? "default" : "secondary"} size="sm" className="px-4" onClick={() => setTransactionType("special")}>
+              Special
+            </Button>
+          </ButtonGroup>
+          <Button size="sm" className="w-fit px-4">Submit Record</Button>
         </div>
       </CardFooter>
     </Card>

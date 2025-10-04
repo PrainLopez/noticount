@@ -24,11 +24,12 @@ export default antfu(
       "node/no-process-env": ["error"],
       "style/jsx-one-expression-per-line": ["off"],
       "perfectionist/sort-imports": [
-        "error",
+        "warn",
         {
           tsconfigRootDir: ".",
         },
       ],
+      "perfectionist/sort-exports": ["warn"],
       "unicorn/filename-case": [
         "error",
         {

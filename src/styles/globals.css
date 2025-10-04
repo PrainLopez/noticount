@@ -4,18 +4,18 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius: 12px;
+  --radius: 24px;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --radius-sm: calc(var(--radius) - 8px);
+  --radius-sm: calc(var(--radius) - 12px);
 
-  --radius-md: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 6px);
 
   --radius-lg: var(--radius);
 
-  --radius-xl: calc(var(--radius) + 8px);
+  --radius-xl: calc(var(--radius) + 12px);
 
   --color-background: var(--background);
 
