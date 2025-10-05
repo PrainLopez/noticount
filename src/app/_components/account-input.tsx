@@ -10,7 +10,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const currency = ["GBP", "USD", "EUR", "CNY"];
+const currency = ["GBP", "USD", "EUR", "CNY", "JPY"];
 
 export default function AccountInput() {
   const [currentComboboxOpen, setCurrentComboboxOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function AccountInput() {
                   <ChevronsUpDown className="opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-20 p-0">
+              <PopoverContent className="w-20 p-0 bg-popover">
                 <Command>
                   <CommandList>
                     <CommandGroup>
@@ -69,11 +69,19 @@ export default function AccountInput() {
       </CardContent>
       <CardFooter>
         <div className="w-full flex flex-row justify-between">
-          <ButtonGroup>
-            <Button variant={transactionType === "daily" ? "default" : "secondary"} size="sm" className="px-4" onClick={() => setTransactionType("daily")}>
+          <ButtonGroup className="*:px-3">
+            <Button
+              variant={transactionType === "daily" ? "default" : "secondary"}
+              size="sm"
+              onClick={() => setTransactionType("daily")}
+            >
               Daily
             </Button>
-            <Button variant={transactionType === "special" ? "default" : "secondary"} size="sm" className="px-4" onClick={() => setTransactionType("special")}>
+            <Button
+              variant={transactionType === "special" ? "default" : "secondary"}
+              size="sm"
+              onClick={() => setTransactionType("special")}
+            >
               Special
             </Button>
           </ButtonGroup>
