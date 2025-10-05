@@ -39,4 +39,10 @@ export default antfu(
       ],
     },
   },
+  {
+    files: ["src/env.js"],
+    rules: {
+      "node/no-process-env": "off",
+    },
+  },
 );

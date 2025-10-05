@@ -4,7 +4,7 @@ import { ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
@@ -73,7 +73,6 @@ export default function AccountInput() {
             <Button variant={transactionType === "daily" ? "default" : "secondary"} size="sm" className="px-4" onClick={() => setTransactionType("daily")}>
               Daily
             </Button>
-            <ButtonGroupSeparator />
             <Button variant={transactionType === "special" ? "default" : "secondary"} size="sm" className="px-4" onClick={() => setTransactionType("special")}>
               Special
             </Button>
