@@ -112,7 +112,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root{
+  :root {
     --background: oklch(0 0 0);
     --foreground: oklch(1 0 0);
     --card: oklch(0.14 0 0);
@@ -164,7 +164,7 @@
     @apply bg-background text-foreground;
   }
 
-    /* 针对 Chrome, Safari, Edge, Opera */
+  /* 针对 Chrome, Safari, Edge, Opera */
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none; /* 移除默认样式 */
@@ -176,4 +176,3 @@
     -moz-appearance: textfield; /* 移除默认样式，将其视为普通文本框 */
   }
 }
-
