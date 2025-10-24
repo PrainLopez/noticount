@@ -74,6 +74,7 @@ export default function AccountInput() {
               variant={transactionType === "daily" ? "default" : "secondary"}
               size="sm"
               onClick={() => setTransactionType("daily")}
+              className="shadow-sm"
             >
               Daily
             </Button>
@@ -81,11 +82,12 @@ export default function AccountInput() {
               variant={transactionType === "special" ? "default" : "secondary"}
               size="sm"
               onClick={() => setTransactionType("special")}
+              className="shadow-sm"
             >
               Special
             </Button>
           </ButtonGroup>
-          <Button size="sm" className="w-fit px-4">Submit Record</Button>
+          <Button size="sm" className="w-fit px-4 shadow-sm">Submit Record</Button>
         </div>
       </CardFooter>
     </Card>
