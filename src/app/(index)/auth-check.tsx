@@ -1,15 +1,17 @@
 "use client";
 
+import type { Session } from "@supabase/supabase-js";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { supabase } from "@/lib/supabase";
-
-import { UidContext } from "../_context/uid-context";
+import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
 
 export default function AuthCheck({ children }: { children: React.ReactNode }) {
-  const [uid, setUid] = useState<string | null>(null);
+  const [authSession, setAuthSession] = useState<Session | null>(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -20,11 +22,12 @@ export default function AuthCheck({ children }: { children: React.ReactNode }) {
         router.replace("/signin");
         return;
       }
+      // console.log(session?.user.id);
       if (!session) {
         router.replace("/signin");
-        return;
       }
-      setUid(session.user.id);
+
+      setAuthSession(session);
     };
 
     checkAuth();
@@ -34,6 +37,8 @@ export default function AuthCheck({ children }: { children: React.ReactNode }) {
         if (!session) {
           router.replace("/signin");
         }
+
+        setAuthSession(session);
       },
     );
 
@@ -55,8 +60,8 @@ export default function AuthCheck({ children }: { children: React.ReactNode }) {
   // }
 
   return (
-    <UidContext value={uid}>
+    <AuthSessionCtx value={authSession}>
       {children}
-    </UidContext>
+    </AuthSessionCtx>
   );
 }

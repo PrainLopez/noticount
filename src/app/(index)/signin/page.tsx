@@ -30,7 +30,7 @@ export default function LoginPage() {
   }, [router]);
 
   const signInWithGitHub = async () => {
-    const redirect = "/login";
+    const redirect = "/signin";
 
     setIsLoading(true);
 

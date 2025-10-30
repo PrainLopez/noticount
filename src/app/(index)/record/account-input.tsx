@@ -10,9 +10,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UidContext } from "@/src/app/_context/uid-context";
-
-import { insertAccountRecord } from "../../api/account-records";
+import { insertAccountRecord } from "@/src/api/account-records";
+import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
 
 export default function AccountInput() {
   const currency = ["GBP", "USD", "EUR", "CNY", "JPY"];
@@ -33,7 +32,7 @@ export default function AccountInput() {
   const [currencyValue, setCurrencyValue] = useState(currency[0]);
   const [transactionType, setTransactionType] = useState("daily");
 
-  const uid = use(UidContext);
+  const uid = use(AuthSessionCtx);
 
   const formSubmit = (e?: React.FormEvent) => {
     if (e)
