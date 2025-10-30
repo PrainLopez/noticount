@@ -1,4 +1,4 @@
-import AccountInput from "@/src/app/_components/account-input";
+import AccountInput from "./account-input";
 
 export default function Home() {
   return (

@@ -6,11 +6,10 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,7 +27,7 @@ export default function LoginPage() {
       }
     };
     checkSession();
-  }, [router, supabase]);
+  }, [router]);
 
   const signInWithGitHub = async () => {
     const redirect = "/login";
