@@ -2,6 +2,7 @@
 
 import { ChevronsUpDown } from "lucide-react";
 import { use, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -31,12 +32,15 @@ export default function AccountInput() {
   const [currentComboboxOpen, setCurrentComboboxOpen] = useState(false);
   const [currencyValue, setCurrencyValue] = useState(currency[0]);
   const [transactionType, setTransactionType] = useState("daily");
+  const [submissionInProgress, setSubmissionInProgress] = useState(false);
 
-  const uid = use(AuthSessionCtx);
+  const authSession = use(AuthSessionCtx);
 
   const formSubmit = (e?: React.FormEvent) => {
     if (e)
       e.preventDefault();
+
+    setSubmissionInProgress(true);
 
     const amount = Number((document.getElementById("amount-input") as HTMLInputElement)?.value || "");
     const note = (document.getElementById("note-input") as HTMLInputElement)?.value || "";
@@ -46,17 +50,19 @@ export default function AccountInput() {
       currency_type: currencyValue,
       note,
       record_type: transactionType,
-      user_id: uid,
+      user_id: authSession?.user.id || "",
     });
 
     if (error) {
-      console.error(`表单错误:\n${error}`);
+      toast.error(`表单错误:\n${error}`);
     }
     if (data) {
       insertAccountRecord(data);
       (document.getElementById("amount-input") as HTMLInputElement).value = "";
       (document.getElementById("note-input") as HTMLInputElement).value = "";
     }
+
+    setSubmissionInProgress(false);
   };
 
   return (
@@ -80,7 +86,7 @@ export default function AccountInput() {
                   <ChevronsUpDown className="opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-20 p-0 bg-popover">
+              <PopoverContent className="w-20 p-0">
                 <Command>
                   <CommandList>
                     <CommandGroup>
@@ -133,7 +139,7 @@ export default function AccountInput() {
           <Button
             size="sm"
             className="w-fit px-4 shadow-sm"
-            disabled={!uid}
+            disabled={authSession?.user === null || submissionInProgress}
             onClick={formSubmit}
           >Submit Record
           </Button>
