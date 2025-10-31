@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "@/src/styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { env } from "@/src/env";
 
 import AuthCheck from "./auth-check";
 import Navbar from "./navbar";
@@ -31,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        {env.NEXT_PUBLIC_ENV_TYPE === "development" && (
+          <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        )}
         {/* rest of your scripts go under */}
       </head>
       <body
