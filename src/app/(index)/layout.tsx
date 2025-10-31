@@ -6,8 +6,8 @@ import "@/src/styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { env } from "@/src/env";
 
-import AuthCheck from "./auth-check";
-import Navbar from "./navbar";
+import AuthCheck from "../_components/auth-check";
+import Navbar from "../_components/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

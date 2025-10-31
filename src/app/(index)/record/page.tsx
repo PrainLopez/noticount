@@ -1,9 +1,5 @@
-import AccountInput from "./account-input";
-
-export default function Home() {
+export default function RecordPage() {
   return (
-    <>
-      <AccountInput />
-    </>
+    <></>
   );
 }
