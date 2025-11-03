@@ -1,8 +1,9 @@
 "use client";
 
-import { Github } from "lucide-react";
+import { Github, HatGlasses } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,22 +30,33 @@ export default function LoginPage() {
     checkSession();
   }, [router]);
 
-  const signInWithGitHub = async () => {
-    const redirect = "/signin";
-
+  const signIn = async (options: "github" | "anonymous") => {
     setIsLoading(true);
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}${redirect}`,
-      },
-    });
+    switch (options) {
+      case "github": {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "github",
+          options: {
+            redirectTo: `${window.location.origin}/signin`,
+          },
+        });
 
-    if (error) {
-      console.error("Error signing in:", error.message);
-      // TODO: show notification to user
+        if (error) {
+          toast.error(`Error signing in: ${error.message}`);
+        }
+        break;
+      }
+      case "anonymous": {
+        const { error } = await supabase.auth.signInAnonymously();
+
+        if (error) {
+          toast.error(`Error signing in: ${error.message}`);
+        }
+        break;
+      }
     }
+
     setIsLoading(false);
   };
 
@@ -58,13 +70,22 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
         <Button
-          onClick={signInWithGitHub}
+          onClick={() => void signIn("github")}
           disabled={isLoading}
           className="w-full max-w-xs"
           size="lg"
         >
           <Github className="size-5" />
           {isLoading ? "Signing in..." : "Sign in with GitHub"}
+        </Button>
+        <Button
+          onClick={() => void signIn("anonymous")}
+          disabled={isLoading}
+          className="w-full max-w-xs"
+          size="lg"
+        >
+          <HatGlasses className="size-5" />
+          {isLoading ? "Signing in..." : "Sign in anonymously"}
         </Button>
       </CardContent>
     </Card>
