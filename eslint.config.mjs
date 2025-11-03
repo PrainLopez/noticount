@@ -1,8 +1,10 @@
 import antfu from "@antfu/eslint-config";
 
-export default antfu(
+export default
+antfu(
   {
     type: "app",
+    nextjs: true,
     react: true,
     typescript: true,
     formatters: true,
@@ -16,6 +18,8 @@ export default antfu(
   },
   {
     rules: {
+      "next/no-sync-scripts": "off",
+      "style/max-statements-per-line": ["error", { max: 2 }],
       "ts/no-redeclare": "off",
       "ts/consistent-type-definitions": ["error", "type"],
       "no-console": ["warn"],
