@@ -38,7 +38,7 @@ antfu(
         "error",
         {
           case: "kebabCase",
-          ignore: ["README.md"],
+          ignore: ["README.md", "AGENTS.md"],
         },
       ],
     },

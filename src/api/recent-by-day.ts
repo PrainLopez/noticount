@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 
-type RecentRecord = {
+export type RecentRecord = {
   amount: number;
   created_at: string;
   currency_type: string;
@@ -10,27 +10,69 @@ type RecentRecord = {
   user_id: string;
 };
 
-function getLast7DaysStartLocal(): Date {
-  const d = new Date();
-  // 回到今天本地 00:00:00
-  d.setHours(0, 0, 0, 0);
-  // 再往前推 6 天，覆盖共 7 天（含今天）
-  d.setDate(d.getDate() - 6);
-  return d;
+export type PaginatedRecords = {
+  data: RecentRecord[];
+  hasMore: boolean;
+  nextPage: number;
+  dateRangeStart: string;
+  dateRangeEnd: string;
+};
+
+/**
+ * Get date range for a 7-day period based on page number
+ * Page 0: Today to 6 days ago (last 7 days)
+ * Page 1: 7 days ago to 13 days ago
+ * Page 2: 14 days ago to 20 days ago, etc.
+ */
+function get7DayRangeLocal(page: number): { start: Date; end: Date } {
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+  // Move end date back by (page * 7) days
+  end.setDate(end.getDate() - (page * 7));
+
+  const start = new Date(end);
+  start.setHours(0, 0, 0, 0);
+  // Start is 6 days before end (7 days total including end day)
+  start.setDate(start.getDate() - 6);
+
+  return { start, end };
 }
 
-export async function getRecentRecordsByDay(userId: string): Promise<RecentRecord[] | null> {
+export async function getRecentRecordsPaginated(
+  userId: string,
+  page: number = 0,
+): Promise<PaginatedRecords> {
+  const { start, end } = get7DayRangeLocal(page);
+
   const { data, error } = await supabase
     .from("account_records")
     .select("*")
     .eq("user_id", userId)
-    .gte("created_at", new Date(getLast7DaysStartLocal().getTime()).toISOString())
+    .gte("created_at", start.toISOString())
+    .lte("created_at", end.toISOString())
     .order("created_at", { ascending: false });
+
   if (error) {
-    // toast.error(`Query error:\n ${error}`);
     return Promise.reject(error);
   }
-  else {
-    return data;
-  }
+
+  // Check if there are records in the next 7-day period
+  const nextRange = get7DayRangeLocal(page + 1);
+  const { data: nextData } = await supabase
+    .from("account_records")
+    .select("id")
+    .eq("user_id", userId)
+    .gte("created_at", nextRange.start.toISOString())
+    .lte("created_at", nextRange.end.toISOString())
+    .limit(1);
+
+  const hasMore = (nextData?.length ?? 0) > 0;
+
+  return {
+    data: data || [],
+    hasMore,
+    nextPage: page + 1,
+    dateRangeStart: start.toISOString(),
+    dateRangeEnd: end.toISOString(),
+  };
 }
