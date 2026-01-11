@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronsUpDown } from "lucide-react";
 import { use, useState } from "react";
 import { toast } from "sonner";
@@ -32,15 +33,31 @@ export default function AccountInput() {
   const [currentComboboxOpen, setCurrentComboboxOpen] = useState(false);
   const [currencyValue, setCurrencyValue] = useState(currency[0]);
   const [transactionType, setTransactionType] = useState("daily");
-  const [submissionInProgress, setSubmissionInProgress] = useState(false);
 
   const authSession = use(AuthSessionCtx);
+  const queryClient = useQueryClient();
+
+  // Setup mutation for inserting account record
+  const mutation = useMutation({
+    mutationFn: insertAccountRecord,
+    onSuccess: () => {
+      // Invalidate and refetch the account-records query to refresh the list
+      queryClient.invalidateQueries({
+        queryKey: ["account-records", authSession?.user?.id],
+      });
+      toast.success("记录提交成功");
+      // Clear form inputs
+      (document.getElementById("amount-input") as HTMLInputElement).value = "";
+      (document.getElementById("note-input") as HTMLInputElement).value = "";
+    },
+    onError: (error) => {
+      toast.error(`记录提交错误:\n${error}`);
+    },
+  });
 
   const formSubmit = (e?: React.FormEvent) => {
     if (e)
       e.preventDefault();
-
-    setSubmissionInProgress(true);
 
     const amount = Number((document.getElementById("amount-input") as HTMLInputElement)?.value || "");
     const note = (document.getElementById("note-input") as HTMLInputElement)?.value || "";
@@ -55,14 +72,12 @@ export default function AccountInput() {
 
     if (error) {
       toast.error(`表单错误:\n${error}`);
-    }
-    if (data) {
-      insertAccountRecord(data);
-      (document.getElementById("amount-input") as HTMLInputElement).value = "";
-      (document.getElementById("note-input") as HTMLInputElement).value = "";
+      return;
     }
 
-    setSubmissionInProgress(false);
+    if (data) {
+      mutation.mutate(data);
+    }
   };
 
   return (
@@ -139,7 +154,7 @@ export default function AccountInput() {
           <Button
             size="sm"
             className="w-fit px-4 shadow-sm"
-            disabled={authSession?.user === null || submissionInProgress}
+            disabled={authSession?.user === null || mutation.isPending}
             onClick={formSubmit}
           >Submit Record
           </Button>

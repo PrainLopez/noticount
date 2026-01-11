@@ -147,29 +147,29 @@ export default function RecordListPage() {
   );
 
   // Calculate date range for display
-  const dateRangeDisplay = useMemo(() => {
-    if (!data?.pages.length)
-      return "Recent Records";
+  // const dateRangeDisplay = useMemo(() => {
+  //   if (!data?.pages.length)
+  //     return "Recent Records";
 
-    const firstPage = data.pages[0];
-    const lastPage = data.pages[data.pages.length - 1];
+  //   const firstPage = data.pages[0];
+  //   const lastPage = data.pages[data.pages.length - 1];
 
-    if (!firstPage || !lastPage)
-      return "Recent Records";
+  //   if (!firstPage || !lastPage)
+  //     return "Recent Records";
 
-    const startDate = new Date(lastPage.dateRangeStart);
-    const endDate = new Date(firstPage.dateRangeEnd);
+  //   const startDate = new Date(lastPage.dateRangeStart);
+  //   const endDate = new Date(firstPage.dateRangeEnd);
 
-    const formatDate = (date: Date) => {
-      return new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }).format(date);
-    };
+  //   const formatDate = (date: Date) => {
+  //     return new Intl.DateTimeFormat("en-US", {
+  //       month: "short",
+  //       day: "numeric",
+  //       year: "numeric",
+  //     }).format(date);
+  //   };
 
-    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
-  }, [data]);
+  //   return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  // }, [data]);
 
   // Set all accordion items to be open by default
   const [openItems, setOpenItems] = useState<string[]>([]);
@@ -223,7 +223,7 @@ export default function RecordListPage() {
   return (
     <Card className="rounded-lg w-full">
       <CardHeader>
-        <CardTitle>{dateRangeDisplay}</CardTitle>
+        <CardTitle className="text-lg">Recent Records</CardTitle>
       </CardHeader>
       <CardContent>
         <Accordion type="multiple" value={openItems} onValueChange={setOpenItems}>
