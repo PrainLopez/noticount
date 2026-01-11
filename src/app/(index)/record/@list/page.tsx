@@ -260,7 +260,7 @@ export default function RecordListPage() {
                           : "bg-purple-100 text-purple-800";
 
                         return (
-                          <TableRow key={record.id} className="grid grid-cols-[2fr_1fr_3fr]">
+                          <TableRow key={record.id} className="grid grid-cols-[2fr_1fr_3fr] ov">
                             <TableCell className="font-semibold gap-1 flex items-center">
                               <span>{currencySymbols[record.currency_type] || record.currency_type}</span>
                               <span>{record.amount.toFixed(2)}</span>
@@ -270,8 +270,8 @@ export default function RecordListPage() {
                                 {record.record_type}
                               </span>
                             </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {record.note || "-"}
+                            <TableCell className="text-muted-foreground text-ellipsis overflow-hidden">
+                              {record.note || "——"}
                             </TableCell>
                           </TableRow>
                         );
