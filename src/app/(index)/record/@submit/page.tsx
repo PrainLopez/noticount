@@ -16,7 +16,7 @@ import { insertAccountRecord } from "@/src/api/account-records";
 import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
 
 export default function AccountInput() {
-  const currency = ["GBP", "USD", "EUR", "CNY", "JPY"];
+  const currency = ["CNY", "GBP", "USD", "EUR", "JPY"];
   const recordType = ["daily", "special"];
 
   const recordSchema = z.object({
