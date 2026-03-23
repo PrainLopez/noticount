@@ -24,6 +24,7 @@
 | `pnpm start`    | 启动生产服务                  |
 | `pnpm lint`     | ESLint 检查（含格式相关规则） |
 | `pnpm lint:fix` | 自动修复可修复项              |
+| `pnpm supabase:type` | 生成 Supabase 类型定义          |
 
 本仓库**没有**单独的 Prettier 配置；**lint 与格式化**由 **ESLint**（`@antfu/eslint-config` + `formatters: true` + `eslint-plugin-format`）统一处理。若风格与文档表述不一致，以 `pnpm lint` 为准。
 

@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "supabase:type": "pnpx supabase gen types --project-id fnndjzbigfwqghcljiph > lib/supabase.type.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -65,8 +66,8 @@
     "pre-commit": "pnpm lint-staged --hide-unstaged"
   },
   "lint-staged": {
-    "*": [
-      "eslint"
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
     ]
   }
 }
