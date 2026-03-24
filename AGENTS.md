@@ -57,14 +57,15 @@ src/app/                 # App Router：页面与布局
     layout.tsx           # QueryClientProvider、AuthCheck、Navbar 等
     signin/page.tsx
     record/              # 记账
-      layout.tsx         # 并行槽位：submit、list
+      layout.tsx         # 并行槽位：submit、usage、list
       @submit/page.tsx
+      @usage/page.tsx
       @list/page.tsx
-  _components/           # 如 auth-check、navbar（非 route segment）
+  _components/           # 如 auth-check、navbar、set-budget-trigger（非 route segment）
   _context/              # 如 auth-session
-src/api/                 # 与 Supabase 的查询/变更封装
+src/api/                 # 与 Supabase 的查询/变更封装（如 usage、user-budget-settings）
 src/styles/              # 全局样式
-components/ui/           # shadcn 风格 UI 组件
+components/ui/           # shadcn 风格 UI 组件（含 drawer）
 lib/                     # supabase 客户端、utils、supabase.type.ts
 ```
 
@@ -101,7 +102,7 @@ flowchart LR
 
 ## 路由说明
 
-- **`/record`** 使用 **并行路由** 槽位 **`@submit`** 与 **`@list`**（见 [`src/app/(index)/record/layout.tsx`](<src/app/(index)/record/layout.tsx>)），同时渲染录入与列表区域。
+- **`/record`** 使用 **并行路由** 槽位 **`@submit`**、**`@usage`** 与 **`@list`**（见 [`src/app/(index)/record/layout.tsx`](<src/app/(index)/record/layout.tsx>)），同时渲染录入、统计与列表区域。
 
 ## Git 与提交
 

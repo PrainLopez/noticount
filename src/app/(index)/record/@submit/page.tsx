@@ -45,6 +45,9 @@ export default function AccountInput() {
       queryClient.invalidateQueries({
         queryKey: ["account-records", authSession?.user?.id],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["usage", authSession?.user?.id],
+      });
       toast.success("记录提交成功");
       // Clear form inputs
       (document.getElementById("amount-input") as HTMLInputElement).value = "";

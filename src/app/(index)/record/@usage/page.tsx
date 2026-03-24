@@ -1,0 +1,131 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { use } from "react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getUsageSummary } from "@/src/api/usage";
+import SetBudgetTrigger from "@/src/app/_components/set-budget-trigger";
+import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
+
+const currencySymbols: Record<string, string> = {
+  GBP: "£",
+  USD: "$",
+  EUR: "€",
+  CNY: "¥",
+  JPY: "¥",
+};
+
+export default function UsagePage() {
+  const authSession = use(AuthSessionCtx);
+
+  const {
+    data,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["usage", authSession?.user?.id],
+    queryFn: () => {
+      if (!authSession?.user?.id) {
+        return Promise.reject(new Error("User not authenticated"));
+      }
+
+      return getUsageSummary(authSession.user.id);
+    },
+    enabled: !!authSession?.user?.id,
+  });
+
+  if (isLoading) {
+    return (
+      <Card className="rounded-lg w-full">
+        <CardHeader>
+          <CardTitle className="text-lg">Usage</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">Loading usage...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <Card className="rounded-lg w-full">
+        <CardHeader>
+          <CardTitle className="text-lg">Usage</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-destructive text-sm">Error loading usage. Please try again.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data.hasBudget) {
+    return (
+      <Card className="rounded-lg w-full">
+        <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+          <CardTitle className="text-lg">Usage</CardTitle>
+          <SetBudgetTrigger currentMonthKey={data.currentMonthKey} isFirstSetup={data.isFirstSetup} />
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-sm">No monthly budget is in effect.</p>
+          <p className="text-muted-foreground text-sm">
+            Set your first monthly budget with time_to_effect = {data.currentMonthKey} to start tracking usage for this month.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="rounded-lg w-full">
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+        <CardTitle className="text-lg">Usage</CardTitle>
+        <SetBudgetTrigger currentMonthKey={data.currentMonthKey} isFirstSetup={data.isFirstSetup} />
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <section className="space-y-2">
+          <p className="text-sm font-semibold">7-Day Average Cost (Daily)</p>
+          {data.items.map(item => (
+            <div key={`avg-${item.currencyType}`} className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{item.currencyType}</span>
+              <span className="font-semibold">
+                {currencySymbols[item.currencyType] || item.currencyType}
+                {item.avgLast7Days.toFixed(2)}
+              </span>
+            </div>
+          ))}
+        </section>
+
+        <section className="space-y-3">
+          <p className="text-sm font-semibold">Monthly Budget Usage (Daily)</p>
+          {data.items.map((item) => {
+            const percentText = `${item.usagePercent.toFixed(1)}%`;
+            const progressPercent = Math.min(item.usagePercent, 100);
+
+            return (
+              <div key={`budget-${item.currencyType}`} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{item.currencyType}</span>
+                  <span className="font-semibold">{percentText}</span>
+                </div>
+                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width]"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground text-right">
+                  {currencySymbols[item.currencyType] || item.currencyType}
+                  {item.monthTotal.toFixed(2)} / {currencySymbols[item.currencyType] || item.currencyType}
+                  {item.budgetAmount.toFixed(2)}
+                </p>
+              </div>
+            );
+          })}
+        </section>
+      </CardContent>
+    </Card>
+  );
+}
