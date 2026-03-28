@@ -71,7 +71,7 @@ export default function UsagePage() {
         <CardContent className="space-y-2">
           <p className="text-sm">No monthly budget is in effect.</p>
           <p className="text-muted-foreground text-sm">
-            Set your first monthly budget with time_to_effect = {data.currentMonthKey} to start tracking usage for this month.
+            Set your first monthly budget to start tracking usage for this month.
           </p>
         </CardContent>
       </Card>
