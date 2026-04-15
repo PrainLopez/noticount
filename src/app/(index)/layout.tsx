@@ -45,7 +45,7 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <AuthCheck>
             <div className="flex flex-col items-center justify-start w-full min-h-screen font-medium">
-              <main className="flex flex-col content-center items-start justify-start w-full max-w-3xl p-4 gap-4">
+              <main className="flex flex-col content-center items-start justify-start w-full max-w-3xl p-2 gap-2">
                 <Toaster />
                 <Navbar />
                 {children}
