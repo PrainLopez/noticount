@@ -1,9 +1,13 @@
 import { supabase } from "@/lib/supabase";
+import { getRecentRecordsPaginated } from "@/src/api/recent-by-day";
 
-type DailyExpenseRecord = {
+type AmountRecord = {
   amount: number;
-  created_at: string;
   currency_type: string;
+};
+
+type DailyExpenseRecord = AmountRecord & {
+  created_at: string;
 };
 
 type BudgetSetting = {
@@ -41,13 +45,7 @@ function getMonthRangeLocal(date: Date): { monthStart: Date; nextMonthStart: Dat
   return { monthStart, nextMonthStart };
 }
 
-function getLast7DaysStartLocal(date: Date): Date {
-  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
-  start.setDate(start.getDate() - 6);
-  return start;
-}
-
-function toMapByCurrency(records: DailyExpenseRecord[]): Record<string, number> {
+function toMapByCurrency(records: AmountRecord[]): Record<string, number> {
   return records.reduce((acc, record) => {
     if (!acc[record.currency_type]) {
       acc[record.currency_type] = 0;
@@ -61,12 +59,12 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
   const now = new Date();
   const currentMonthKey = getCurrentMonthKey(now);
   const { monthStart, nextMonthStart } = getMonthRangeLocal(now);
-  const last7DaysStart = getLast7DaysStartLocal(now);
 
   const [
     { data: monthlyDailyData, error: recordsError },
     { data: budgetData, error: budgetError },
     { data: anyBudgetData, error: anyBudgetError },
+    recentRecordsPage,
   ]
     = await Promise.all([
       supabase
@@ -88,6 +86,7 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
         .select("id")
         .eq("user_id", userId)
         .limit(1),
+      getRecentRecordsPaginated(userId, 0),
     ]);
 
   if (recordsError) {
@@ -125,8 +124,8 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
   }
 
   const monthTotalByCurrency = toMapByCurrency(monthlyRecords);
-  const last7DaysRecords = monthlyRecords.filter(record => new Date(record.created_at) >= last7DaysStart);
-  const last7DaysTotalByCurrency = toMapByCurrency(last7DaysRecords);
+  const last7DaysDailyRecords = recentRecordsPage.data.filter(record => record.record_type === "daily");
+  const last7DaysTotalByCurrency = toMapByCurrency(last7DaysDailyRecords);
 
   const items = budgetCurrencies.map((currencyType) => {
     const monthTotal = monthTotalByCurrency[currencyType] ?? 0;
