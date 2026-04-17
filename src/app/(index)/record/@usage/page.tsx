@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getUsageSummary } from "@/src/api/usage";
 import SetBudgetTrigger from "@/src/app/_components/set-budget-trigger";
 import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
@@ -41,8 +42,26 @@ export default function UsagePage() {
         <CardHeader>
           <CardTitle className="text-lg">Usage</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">Loading usage...</p>
+        <CardContent className="space-y-4">
+          <section className="space-y-1.5">
+            <Skeleton className="h-5 w-44" />
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-10" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          </section>
+
+          <section className="space-y-2">
+            <Skeleton className="h-5 w-52" />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-10" />
+                <Skeleton className="h-4 w-12" />
+              </div>
+              <Skeleton className="h-2 w-full rounded-full" />
+              <Skeleton className="h-4 w-32 ml-auto" />
+            </div>
+          </section>
         </CardContent>
       </Card>
     );

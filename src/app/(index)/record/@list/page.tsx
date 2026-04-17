@@ -8,6 +8,7 @@ import type { RecentRecord } from "@/src/api/recent-by-day";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { getRecentRecordsPaginated } from "@/src/api/recent-by-day";
 import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
@@ -187,8 +188,20 @@ export default function RecordListPage() {
         <CardHeader>
           <CardTitle>Recent Records</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">Loading records...</p>
+        <CardContent className="space-y-4">
+          {["day-a", "day-b", "day-c"].map(key => (
+            <div key={key} className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <Skeleton className="h-5 w-28" />
+                <Skeleton className="h-5 w-12" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            </div>
+          ))}
         </CardContent>
       </Card>
     );
