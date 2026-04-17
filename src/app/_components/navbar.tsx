@@ -17,9 +17,6 @@ export default function Navbar() {
     if (error) {
       console.error("Error signing out:", error.message);
     }
-    else {
-      console.log("Signed out successfully");
-    }
   };
 
   if (authSession?.user) {

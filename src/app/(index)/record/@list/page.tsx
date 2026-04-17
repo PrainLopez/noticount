@@ -135,7 +135,10 @@ export default function RecordListPage() {
     };
   }, [handleObserver]);
 
-  const allRecords = data?.pages.flatMap(page => page.data) || [];
+  const allRecords = useMemo(
+    () => data?.pages.flatMap(page => page.data) ?? [],
+    [data?.pages],
+  );
 
   const groupedRecords = useMemo(
     () => groupRecordsByLocalDay(allRecords),
@@ -172,15 +175,16 @@ export default function RecordListPage() {
   //   return `${formatDate(startDate)} - ${formatDate(endDate)}`;
   // }, [data]);
 
-  // Set all accordion items to be open by default
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  const [closedItems, setClosedItems] = useState<string[]>([]);
 
-  useEffect(() => {
-    setOpenItems((prev) => {
-      const newDays = sortedDays.filter(day => !prev.includes(day));
-      return [...prev, ...newDays];
-    });
-  }, [sortedDays.join(",")]);
+  const openItems = useMemo(
+    () => sortedDays.filter(day => !closedItems.includes(day)),
+    [closedItems, sortedDays],
+  );
+
+  const handleOpenItemsChange = useCallback((nextOpenItems: string[]) => {
+    setClosedItems(sortedDays.filter(day => !nextOpenItems.includes(day)));
+  }, [sortedDays]);
 
   if (isLoading) {
     return (
@@ -239,7 +243,7 @@ export default function RecordListPage() {
         <CardTitle className="text-lg">Recent Records</CardTitle>
       </CardHeader>
       <CardContent>
-        <Accordion type="multiple" value={openItems} onValueChange={setOpenItems}>
+        <Accordion type="multiple" value={openItems} onValueChange={handleOpenItemsChange}>
           {sortedDays.map((day) => {
             const dayRecords = groupedRecords[day];
             const daySummary = calculateDaySummary(dayRecords);
