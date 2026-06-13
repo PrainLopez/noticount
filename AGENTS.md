@@ -104,6 +104,17 @@ flowchart LR
 
 - **`/record`** 用并行路由槽位 **`@submit`**、**`@usage`**、**`@list`**（见 [`src/app/(index)/record/layout.tsx`](<src/app/(index)/record/layout.tsx>)），同屏渲染录入、统计、列表。
 
+## 通用领域概念
+
+- **`account_record`**：用户创建的单条记账记录，字段见 `lib/supabase.type.ts` 中的 `account_records` 表。关键字段：
+  - `currency_type`：币种，业务上目前为 `CNY`、`GBP`、`USD`、`EUR`、`JPY`。
+  - `record_type`：记录分类，仅 `daily`（日常）或 `special`（非日常）。
+- **`/record/@list` 中的 Day Summary Badge**：每日记录分组头部显示的汇总徽标，表示某币种 × 某记录类型的合计金额。规则：
+  - 只显示实际存在记录的组合。
+  - `daily` 用蓝色系，`special` 用紫色系。
+  - 排序：先按币种 `CNY → GBP → USD → EUR → JPY`，同一币种下 `daily` 在前、`special` 在后。
+  - 金额始终保留两位小数，并附带对应币种符号。
+
 ## Git 与提交
 
 - **simple-git-hooks**：`pre-commit` 跑 **lint-staged**，对暂存文件执行 **`eslint`**。

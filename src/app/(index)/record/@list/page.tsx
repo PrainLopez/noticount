@@ -15,10 +15,43 @@ import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
 
 type GroupedRecords = Record<string, RecentRecord[]>;
 
+type CurrencyTotals = Record<string, Record<string, number>>;
+
 type DaySummary = {
   count: number;
-  totalsByCurrency: Record<string, number>;
+  totals: CurrencyTotals;
 };
+
+const currencySymbols: Record<string, string> = {
+  GBP: "£",
+  USD: "$",
+  EUR: "€",
+  CNY: "¥",
+  JPY: "¥",
+};
+
+const currencyOrder = ["CNY", "GBP", "USD", "EUR", "JPY"];
+const recordTypeOrder = ["daily", "special"];
+
+function sortByDefinedOrder(a: string, b: string, order: string[]): number {
+  const indexA = order.indexOf(a);
+  const indexB = order.indexOf(b);
+
+  if (indexA === -1 && indexB === -1)
+    return a.localeCompare(b);
+  if (indexA === -1)
+    return 1;
+  if (indexB === -1)
+    return -1;
+
+  return indexA - indexB;
+}
+
+function getRecordTypeColor(recordType: string): string {
+  return recordType === "daily"
+    ? "bg-blue-100 text-blue-800"
+    : "bg-purple-100 text-purple-800";
+}
 
 function groupRecordsByLocalDay(records: RecentRecord[]): GroupedRecords {
   return records.reduce((groups, record) => {
@@ -35,29 +68,24 @@ function groupRecordsByLocalDay(records: RecentRecord[]): GroupedRecords {
 }
 
 function calculateDaySummary(records: RecentRecord[]): DaySummary {
-  const totalsByCurrency = records.reduce((totals, record) => {
-    if (!totals[record.currency_type]) {
-      totals[record.currency_type] = 0;
+  const totals = records.reduce((acc, record) => {
+    if (!acc[record.currency_type]) {
+      acc[record.currency_type] = {};
     }
-    totals[record.currency_type] += record.amount;
-    return totals;
-  }, {} as Record<string, number>);
+    if (!acc[record.currency_type][record.record_type]) {
+      acc[record.currency_type][record.record_type] = 0;
+    }
+    acc[record.currency_type][record.record_type] += record.amount;
+    return acc;
+  }, {} as CurrencyTotals);
 
   return {
     count: records.length,
-    totalsByCurrency,
+    totals,
   };
 }
 
 function DayHeader({ date, summary }: { date: string; summary: DaySummary }) {
-  const currencySymbols: Record<string, string> = {
-    GBP: "£",
-    USD: "$",
-    EUR: "€",
-    CNY: "¥",
-    JPY: "¥",
-  };
-
   const formatDayHeader = (dateString: string) => {
     const [year, month, day] = dateString.split("-");
     const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -75,11 +103,19 @@ function DayHeader({ date, summary }: { date: string; summary: DaySummary }) {
         <span className="text-xs text-muted-foreground">
           {summary.count} {summary.count === 1 ? "record" : "records"}
         </span>
-        {Object.entries(summary.totalsByCurrency).map(([currency, total]) => (
-          <Badge key={currency} variant="default">
-            {currencySymbols[currency] || currency}{total.toFixed(2)}
-          </Badge>
-        ))}
+        {Object.entries(summary.totals)
+          .sort(([a], [b]) => sortByDefinedOrder(a, b, currencyOrder))
+          .map(([currency, types]) =>
+            Object.entries(types)
+              .sort(([a], [b]) => sortByDefinedOrder(a, b, recordTypeOrder))
+              .map(([recordType, total]) => {
+                return (
+                  <Badge key={`${currency}-${recordType}`} className={getRecordTypeColor(recordType)}>
+                    {currencySymbols[currency] || currency}{total.toFixed(2)}
+                  </Badge>
+                );
+              }),
+          )}
       </div>
     </div>
   );
@@ -264,18 +300,6 @@ export default function RecordListPage() {
                     </TableHeader> */}
                     <TableBody>
                       {dayRecords.map((record) => {
-                        const currencySymbols: Record<string, string> = {
-                          GBP: "£",
-                          USD: "$",
-                          EUR: "€",
-                          CNY: "¥",
-                          JPY: "¥",
-                        };
-
-                        const typeColor = record.record_type === "daily"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-purple-100 text-purple-800";
-
                         return (
                           <TableRow key={record.id} className="grid grid-cols-[2fr_1fr_3fr] ov">
                             <TableCell className="font-semibold gap-1 flex items-center">
@@ -283,7 +307,7 @@ export default function RecordListPage() {
                               <span>{record.amount.toFixed(2)}</span>
                             </TableCell>
                             <TableCell className="">
-                              <span className={`text-xs px-2 py-1 rounded-full ${typeColor}`}>
+                              <span className={`text-xs px-2 py-1 rounded-full ${getRecordTypeColor(record.record_type)}`}>
                                 {record.record_type}
                               </span>
                             </TableCell>

@@ -27,7 +27,7 @@ export default function AccountInput() {
     currency_type: z.enum(currency, "货币类型无效"),
     note: z.string().max(80, "备注不能超过80字"),
     record_type: z.enum(recordType, "记录类型无效"),
-    user_id: z.uuid("用户ID无效"),
+    user_id: z.string().uuid("用户ID无效"),
   });
 
   const [currentComboboxOpen, setCurrentComboboxOpen] = useState(false);

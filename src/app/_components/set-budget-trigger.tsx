@@ -68,7 +68,7 @@ function createBudgetSchema(currentMonthKey: number) {
         const month = value % 100;
         return month >= 1 && month <= 12;
       }, "Month must be between 01 and 12"),
-    user_id: z.uuid("User ID is invalid"),
+    user_id: z.string().uuid("User ID is invalid"),
   });
 }
 
