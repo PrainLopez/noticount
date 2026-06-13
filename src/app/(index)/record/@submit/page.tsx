@@ -16,17 +16,21 @@ import { insertAccountRecord } from "@/src/api/account-records";
 import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
 
 export default function AccountInput() {
-  const currency = ["CNY", "GBP", "USD", "EUR", "JPY"];
-  const recordType = ["daily", "special"];
+  const currency: [string, ...string[]] = ["CNY", "GBP", "USD", "EUR", "JPY"];
+  const recordType: [string, ...string[]] = ["daily", "special"];
 
   const recordSchema = z.object({
     amount: z
       .number()
       .min(0.01, "金额必须大于0")
       .max(9999999999.99, "金额不能超过numeric(10, 2)"),
-    currency_type: z.enum(currency, "货币类型无效"),
+    currency_type: z.enum(currency as [string, ...string[]], {
+      errorMap: () => ({ message: "货币类型无效" }),
+    }),
     note: z.string().max(80, "备注不能超过80字"),
-    record_type: z.enum(recordType, "记录类型无效"),
+    record_type: z.enum(recordType as [string, ...string[]], {
+      errorMap: () => ({ message: "记录类型无效" }),
+    }),
     user_id: z.string().uuid("用户ID无效"),
   });
 
