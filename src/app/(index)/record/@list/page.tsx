@@ -56,7 +56,7 @@ function getRecordTypeColor(recordType: string): string {
 function groupRecordsByLocalDay(records: RecentRecord[]): GroupedRecords {
   return records.reduce((groups, record) => {
     const date = new Date(record.created_at);
-    const localDay = date.toLocaleDateString("en-CA"); // YYYY-MM-DD format
+    const localDay = date.toLocaleDateString("en-CA");
 
     if (!groups[localDay]) {
       groups[localDay] = [];
@@ -75,7 +75,7 @@ function calculateDaySummary(records: RecentRecord[]): DaySummary {
     if (!acc[record.currency_type][record.record_type]) {
       acc[record.currency_type][record.record_type] = 0;
     }
-    acc[record.currency_type][record.record_type] += record.amount;
+    acc[record.currency_type][record.record_type] += Number(record.amount);
     return acc;
   }, {} as CurrencyTotals);
 
@@ -101,7 +101,9 @@ function DayHeader({ date, summary }: { date: string; summary: DaySummary }) {
       <h3 className="font-semibold text-base">{formatDayHeader(date)}</h3>
       <div className="flex flex-row gap-2 items-center flex-wrap">
         <span className="text-xs text-muted-foreground">
-          {summary.count} {summary.count === 1 ? "record" : "records"}
+          {summary.count}
+          {" "}
+          {summary.count === 1 ? "record" : "records"}
         </span>
         {Object.entries(summary.totals)
           .sort(([a], [b]) => sortByDefinedOrder(a, b, currencyOrder))
@@ -111,7 +113,8 @@ function DayHeader({ date, summary }: { date: string; summary: DaySummary }) {
               .map(([recordType, total]) => {
                 return (
                   <Badge key={`${currency}-${recordType}`} className={getRecordTypeColor(recordType)}>
-                    {currencySymbols[currency] || currency}{total.toFixed(2)}
+                    {currencySymbols[currency] || currency}
+                    {total.toFixed(2)}
                   </Badge>
                 );
               }),
@@ -133,24 +136,24 @@ export default function RecordListPage() {
     isLoading,
     isError,
   } = useInfiniteQuery({
-    queryKey: ["account-records", authSession?.user?.id],
+    queryKey: ["account-records", authSession?.userId],
     queryFn: ({ pageParam = 0 }) => {
-      if (!authSession?.user?.id) {
+      if (!authSession?.userId) {
         return Promise.reject(new Error("User not authenticated"));
       }
-      return getRecentRecordsPaginated(authSession.user.id, pageParam);
+      return getRecentRecordsPaginated(authSession.userId, pageParam);
     },
     getNextPageParam: (lastPage) => {
       return lastPage.hasMore ? lastPage.nextPage : undefined;
     },
-    enabled: !!authSession?.user?.id,
+    enabled: !!authSession?.userId,
     initialPageParam: 0,
   });
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const [target] = entries;
-      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+      if (target?.isIntersecting && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     },
@@ -185,31 +188,6 @@ export default function RecordListPage() {
     () => Object.keys(groupedRecords).sort((a, b) => b.localeCompare(a)),
     [groupedRecords],
   );
-
-  // Calculate date range for display
-  // const dateRangeDisplay = useMemo(() => {
-  //   if (!data?.pages.length)
-  //     return "Recent Records";
-
-  //   const firstPage = data.pages[0];
-  //   const lastPage = data.pages[data.pages.length - 1];
-
-  //   if (!firstPage || !lastPage)
-  //     return "Recent Records";
-
-  //   const startDate = new Date(lastPage.dateRangeStart);
-  //   const endDate = new Date(firstPage.dateRangeEnd);
-
-  //   const formatDate = (date: Date) => {
-  //     return new Intl.DateTimeFormat("en-US", {
-  //       month: "short",
-  //       day: "numeric",
-  //       year: "numeric",
-  //     }).format(date);
-  //   };
-
-  //   return `${formatDate(startDate)} - ${formatDate(endDate)}`;
-  // }, [data]);
 
   const [closedItems, setClosedItems] = useState<string[]>([]);
 
@@ -291,20 +269,13 @@ export default function RecordListPage() {
                 </AccordionTrigger>
                 <AccordionContent className="pb-0">
                   <Table>
-                    {/* <TableHeader>
-                      <TableRow>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Note</TableHead>
-                      </TableRow>
-                    </TableHeader> */}
                     <TableBody>
                       {dayRecords.map((record) => {
                         return (
                           <TableRow key={record.id} className="grid grid-cols-[2fr_1fr_3fr] ov">
                             <TableCell className="font-semibold gap-1 flex items-center">
                               <span>{currencySymbols[record.currency_type] || record.currency_type}</span>
-                              <span>{record.amount.toFixed(2)}</span>
+                              <span>{Number(record.amount).toFixed(2)}</span>
                             </TableCell>
                             <TableCell className="">
                               <span className={`text-xs px-2 py-1 rounded-full ${getRecordTypeColor(record.record_type)}`}>

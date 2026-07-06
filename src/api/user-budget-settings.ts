@@ -1,18 +1,19 @@
-import { supabase } from "@/lib/supabase";
+import type { CurrencyType } from "@/src/db/schema";
 
-type BudgetSettingInsertData = {
-  budget_amount: number;
-  currency_type: string;
-  time_to_effect: number;
-  user_id: string;
+export type InsertBudgetSettingPayload = {
+  budgetAmount: string;
+  currencyType: CurrencyType;
+  timeToEffect: number;
 };
 
-export async function insertBudgetSetting(input: BudgetSettingInsertData) {
-  const { error } = await supabase
-    .from("user_budget_settings")
-    .insert(input);
+export async function insertBudgetSetting(payload: InsertBudgetSettingPayload): Promise<void> {
+  const response = await fetch("/api/user-budget-settings", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-  if (error) {
-    throw error;
+  if (!response.ok) {
+    throw new Error(`Insert budget setting failed: ${response.status}`);
   }
 }

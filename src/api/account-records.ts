@@ -1,19 +1,20 @@
-import { supabase } from "@/lib/supabase";
+import type { CurrencyType, RecordType } from "@/src/db/schema";
 
-type AccountRecordInsertData = {
-  amount: number;
-  currency_type: string;
-  note: string;
-  record_type: string;
-  user_id: string;
+export type InsertAccountRecordPayload = {
+  amount: string;
+  currencyType: CurrencyType;
+  note: string | null;
+  recordType: RecordType;
 };
 
-export async function insertAccountRecord(input: AccountRecordInsertData) {
-  const { error } = await supabase
-    .from("account_records")
-    .insert(input);
+export async function insertAccountRecord(payload: InsertAccountRecordPayload): Promise<void> {
+  const response = await fetch("/api/account-records", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-  if (error) {
-    throw error;
+  if (!response.ok) {
+    throw new Error(`Insert account record failed: ${response.status}`);
   }
 }

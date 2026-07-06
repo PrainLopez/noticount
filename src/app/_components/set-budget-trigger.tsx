@@ -13,8 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { insertBudgetSetting } from "@/src/api/user-budget-settings";
 import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
-
-const currencies = ["CNY", "GBP", "USD", "EUR", "JPY"];
+import { currencyTypeValues } from "@/src/db/schema";
 
 type SetBudgetTriggerProps = {
   currentMonthKey: number;
@@ -54,12 +53,13 @@ function formatErrorMessage(error: unknown): string {
 
 function createBudgetSchema(currentMonthKey: number) {
   return z.object({
-    budget_amount: z
-      .number()
-      .min(0.01, "Budget amount must be greater than 0")
-      .max(9999999999.99, "Budget amount exceeds numeric(10, 2)"),
-    currency_type: z.string().length(3, "Currency must be 3 letters"),
-    time_to_effect: z
+    budgetAmount: z
+      .string()
+      .regex(/^\d+(\.\d{1,2})?$/, "金额格式不正确")
+      .refine(value => Number(value) > 0, "Budget amount must be greater than 0")
+      .refine(value => Number(value) <= 9999999999.99, "Budget amount exceeds numeric(18, 2)"),
+    currencyType: z.enum(currencyTypeValues),
+    timeToEffect: z
       .number()
       .int()
       .min(currentMonthKey, "Month cannot be earlier than current month")
@@ -68,31 +68,14 @@ function createBudgetSchema(currentMonthKey: number) {
         const month = value % 100;
         return month >= 1 && month <= 12;
       }, "Month must be between 01 and 12"),
-    user_id: z.string().uuid("User ID is invalid"),
   });
 }
 
 function isSmDownViewport(): boolean {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return window.matchMedia("(max-width: 639px)").matches;
+  return false;
 }
 
-function BudgetForm({
-  budgetAmountValue,
-  currencyOpen,
-  currencyValue,
-  isFirstSetup,
-  monthValue,
-  onBudgetAmountChange,
-  onCurrencyOpenChange,
-  onCurrencySelect,
-  onMonthChange,
-  onSubmit,
-  pending,
-}: {
+type BudgetFormProps = {
   budgetAmountValue: string;
   currencyOpen: boolean;
   currencyValue: string;
@@ -100,80 +83,83 @@ function BudgetForm({
   monthValue: string;
   onBudgetAmountChange: (value: string) => void;
   onCurrencyOpenChange: (open: boolean) => void;
-  onCurrencySelect: (value: string) => void;
+  onCurrencySelect: (currency: string) => void;
   onMonthChange: (value: string) => void;
   onSubmit: () => void;
   pending: boolean;
-}) {
+};
+
+function BudgetForm(props: BudgetFormProps) {
+  const {
+    budgetAmountValue,
+    currencyOpen,
+    currencyValue,
+    isFirstSetup,
+    monthValue,
+    onBudgetAmountChange,
+    onCurrencyOpenChange,
+    onCurrencySelect,
+    onMonthChange,
+    onSubmit,
+    pending,
+  } = props;
+
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm font-semibold">Setup Monthly Budget</p>
-      <div className="grid grid-cols-2 gap-2">
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-muted-foreground">Month</p>
-          <Input
-            type="month"
-            placeholder="YYYY-MM"
-            value={monthValue}
-            disabled={isFirstSetup}
-            onChange={event => onMonthChange(event.target.value)}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-muted-foreground">Currency</p>
-          <Popover open={currencyOpen} onOpenChange={onCurrencyOpenChange}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={currencyOpen}
-                className="justify-between"
-              >
-                {currencyValue}
-                <ChevronsUpDown />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-              <Command>
-                <CommandList>
-                  <CommandGroup>
-                    {currencies.map(currency => (
-                      <CommandItem
-                        key={currency}
-                        value={currency}
-                        onSelect={() => onCurrencySelect(currency)}
-                      >
-                        {currency}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-      {isFirstSetup && (
-        <p className="text-xs text-muted-foreground">
-          First setup is locked to current month.
-        </p>
-      )}
       <div className="flex flex-col gap-1">
-        <p className="text-xs text-muted-foreground">Budget amount</p>
+        <span className="text-xs text-muted-foreground">Currency</span>
+        <Popover open={currencyOpen} onOpenChange={onCurrencyOpenChange}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" role="combobox" aria-expanded={currencyOpen} className="w-full justify-between">
+              {currencyValue}
+              <ChevronsUpDown className="opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+            <Command>
+              <CommandList>
+                <CommandGroup>
+                  {currencyTypeValues.map(curr => (
+                    <CommandItem
+                      key={curr}
+                      value={curr}
+                      onSelect={() => onCurrencySelect(curr)}
+                    >
+                      <span>{curr}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-muted-foreground">Budget amount</span>
         <Input
           type="number"
-          placeholder="0.00"
+          inputMode="decimal"
+          step="0.01"
           value={budgetAmountValue}
-          onChange={event => onBudgetAmountChange(event.target.value)}
+          onChange={e => onBudgetAmountChange(e.target.value)}
+          placeholder="0.00"
         />
       </div>
-      <Button
-        size="sm"
-        className="w-full"
-        disabled={pending}
-        onClick={onSubmit}
-      >
-        Save Budget
+
+      {!isFirstSetup && (
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-muted-foreground">Effective from</span>
+          <Input
+            type="month"
+            value={monthValue}
+            onChange={e => onMonthChange(e.target.value)}
+          />
+        </div>
+      )}
+
+      <Button onClick={onSubmit} disabled={pending}>
+        {pending ? "Saving..." : "Save budget"}
       </Button>
     </div>
   );
@@ -190,7 +176,7 @@ export default function SetBudgetTrigger({ currentMonthKey, isFirstSetup }: SetB
 
   const [open, setOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [currencyValue, setCurrencyValue] = useState("CNY");
+  const [currencyValue, setCurrencyValue] = useState<string>(currencyTypeValues[0]);
   const [budgetAmountValue, setBudgetAmountValue] = useState("");
   const [monthValue, setMonthValue] = useState(resolvedCurrentMonth);
 
@@ -200,7 +186,7 @@ export default function SetBudgetTrigger({ currentMonthKey, isFirstSetup }: SetB
     mutationFn: insertBudgetSetting,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["usage", authSession?.user?.id],
+        queryKey: ["usage", authSession?.userId],
       });
       toast.success("Budget has been saved");
       setOpen(false);
@@ -214,7 +200,7 @@ export default function SetBudgetTrigger({ currentMonthKey, isFirstSetup }: SetB
   });
 
   const handleSubmit = () => {
-    if (!authSession?.user?.id) {
+    if (!authSession?.userId) {
       toast.error("User not authenticated");
       return;
     }
@@ -224,10 +210,9 @@ export default function SetBudgetTrigger({ currentMonthKey, isFirstSetup }: SetB
       : monthInputToMonthKey(monthValue);
 
     const { data, error } = budgetSchema.safeParse({
-      budget_amount: Number(budgetAmountValue),
-      currency_type: currencyValue,
-      time_to_effect: monthToUse,
-      user_id: authSession.user.id,
+      budgetAmount: budgetAmountValue.trim(),
+      currencyType: currencyValue,
+      timeToEffect: monthToUse,
     });
 
     if (error) {

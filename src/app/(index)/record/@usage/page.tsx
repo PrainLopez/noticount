@@ -25,15 +25,15 @@ export default function UsagePage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["usage", authSession?.user?.id],
+    queryKey: ["usage", authSession?.userId],
     queryFn: () => {
-      if (!authSession?.user?.id) {
+      if (!authSession?.userId) {
         return Promise.reject(new Error("User not authenticated"));
       }
 
-      return getUsageSummary(authSession.user.id);
+      return getUsageSummary(authSession.userId);
     },
-    enabled: !!authSession?.user?.id,
+    enabled: !!authSession?.userId,
   });
 
   if (isLoading) {
@@ -111,7 +111,7 @@ export default function UsagePage() {
               <span className="text-muted-foreground">{item.currencyType}</span>
               <span className="font-semibold">
                 {currencySymbols[item.currencyType] || item.currencyType}
-                {item.avgLast7Days.toFixed(2)}
+                {Number(item.avgLast7Days).toFixed(2)}
               </span>
             </div>
           ))}
@@ -120,8 +120,8 @@ export default function UsagePage() {
         <section className="space-y-3">
           <p className="text-sm font-semibold">Monthly Budget Usage (Daily)</p>
           {data.items.map((item) => {
-            const percentText = `${item.usagePercent.toFixed(1)}%`;
-            const progressPercent = Math.min(item.usagePercent, 100);
+            const percentText = `${Number(item.usagePercent).toFixed(1)}%`;
+            const progressPercent = Math.min(Number(item.usagePercent), 100);
 
             return (
               <div key={`budget-${item.currencyType}`} className="space-y-1">
@@ -137,8 +137,10 @@ export default function UsagePage() {
                 </div>
                 <p className="text-xs text-muted-foreground text-right">
                   {currencySymbols[item.currencyType] || item.currencyType}
-                  {item.monthTotal.toFixed(2)} / {currencySymbols[item.currencyType] || item.currencyType}
-                  {item.budgetAmount.toFixed(2)}
+                  {Number(item.monthTotal).toFixed(2)}
+                  {" / "}
+                  {currencySymbols[item.currencyType] || item.currencyType}
+                  {Number(item.budgetAmount).toFixed(2)}
                 </p>
               </div>
             );

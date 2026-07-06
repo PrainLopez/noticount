@@ -1,5 +1,11 @@
-import type { Session } from "@supabase/supabase-js";
-
 import { createContext } from "react";
 
-export const AuthSessionCtx = createContext<Session | null>(null);
+export type AuthSession = {
+  userId: string;
+  email: string | null;
+  avatarUrl: string | null;
+  userName: string | null;
+  provider: string | null;
+} | null;
+
+export const AuthSessionCtx = createContext<AuthSession>(null);

@@ -4,7 +4,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronsUpDown } from "lucide-react";
 import { use, useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -14,46 +13,22 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { insertAccountRecord } from "@/src/api/account-records";
 import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
+import { currencyTypeValues, recordTypeValues } from "@/src/db/schema";
 
 export default function AccountInput() {
-  const currency: [string, ...string[]] = ["CNY", "GBP", "USD", "EUR", "JPY"];
-  const recordType: [string, ...string[]] = ["daily", "special"];
-
-  const recordSchema = z.object({
-    amount: z
-      .number()
-      .min(0.01, "金额必须大于0")
-      .max(9999999999.99, "金额不能超过numeric(10, 2)"),
-    currency_type: z.enum(currency as [string, ...string[]], {
-      errorMap: () => ({ message: "货币类型无效" }),
-    }),
-    note: z.string().max(80, "备注不能超过80字"),
-    record_type: z.enum(recordType as [string, ...string[]], {
-      errorMap: () => ({ message: "记录类型无效" }),
-    }),
-    user_id: z.string().uuid("用户ID无效"),
-  });
-
-  const [currentComboboxOpen, setCurrentComboboxOpen] = useState(false);
-  const [currencyValue, setCurrencyValue] = useState(currency[0]);
-  const [transactionType, setTransactionType] = useState("daily");
-
   const authSession = use(AuthSessionCtx);
   const queryClient = useQueryClient();
 
-  // Setup mutation for inserting account record
+  const [currentComboboxOpen, setCurrentComboboxOpen] = useState(false);
+  const [currencyValue, setCurrencyValue] = useState<string>(currencyTypeValues[0]);
+  const [transactionType, setTransactionType] = useState<string>(recordTypeValues[0]);
+
   const mutation = useMutation({
     mutationFn: insertAccountRecord,
     onSuccess: () => {
-      // Invalidate and refetch the account-records query to refresh the list
-      queryClient.invalidateQueries({
-        queryKey: ["account-records", authSession?.user?.id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["usage", authSession?.user?.id],
-      });
+      queryClient.invalidateQueries({ queryKey: ["account-records", authSession?.userId] });
+      queryClient.invalidateQueries({ queryKey: ["usage", authSession?.userId] });
       toast.success("记录提交成功");
-      // Clear form inputs
       (document.getElementById("amount-input") as HTMLInputElement).value = "";
       (document.getElementById("note-input") as HTMLInputElement).value = "";
     },
@@ -66,25 +41,41 @@ export default function AccountInput() {
     if (e)
       e.preventDefault();
 
-    const amount = Number((document.getElementById("amount-input") as HTMLInputElement)?.value || "");
-    const note = (document.getElementById("note-input") as HTMLInputElement)?.value || "";
+    const amountText = (document.getElementById("amount-input") as HTMLInputElement)?.value || "";
+    const noteText = (document.getElementById("note-input") as HTMLInputElement)?.value || "";
 
-    const { data, error } = recordSchema.safeParse({
-      amount,
-      currency_type: currencyValue,
-      note,
-      record_type: transactionType,
-      user_id: authSession?.user.id || "",
-    });
-
-    if (error) {
-      toast.error(`表单错误:\n${error}`);
+    const amount = amountText.trim();
+    if (!/^\d+(?:\.\d{1,2})?$/.test(amount)) {
+      toast.error("表单错误:金额格式不正确");
+      return;
+    }
+    if (Number(amount) <= 0) {
+      toast.error("表单错误:金额必须大于0");
+      return;
+    }
+    if (!currencyTypeValues.includes(currencyValue as typeof currencyTypeValues[number])) {
+      toast.error("表单错误:货币类型无效");
+      return;
+    }
+    if (!recordTypeValues.includes(transactionType as typeof recordTypeValues[number])) {
+      toast.error("表单错误:记录类型无效");
+      return;
+    }
+    if (noteText.length > 80) {
+      toast.error("表单错误:备注不能超过80字");
+      return;
+    }
+    if (!authSession?.userId) {
+      toast.error("表单错误:未登录");
       return;
     }
 
-    if (data) {
-      mutation.mutate(data);
-    }
+    mutation.mutate({
+      amount,
+      currencyType: currencyValue as typeof currencyTypeValues[number],
+      note: noteText,
+      recordType: transactionType as typeof recordTypeValues[number],
+    });
   };
 
   return (
@@ -112,7 +103,7 @@ export default function AccountInput() {
                 <Command>
                   <CommandList>
                     <CommandGroup>
-                      {currency.map(curr => (
+                      {currencyTypeValues.map(curr => (
                         <CommandItem
                           key={curr}
                           value={curr}
@@ -142,17 +133,17 @@ export default function AccountInput() {
         <div className="w-full flex flex-row justify-between">
           <ButtonGroup className="*:px-3">
             <Button
-              variant={transactionType === "daily" ? "default" : "secondary"}
+              variant={transactionType === recordTypeValues[0] ? "default" : "secondary"}
               size="sm"
-              onClick={() => setTransactionType("daily")}
+              onClick={() => setTransactionType(recordTypeValues[0])}
               className="shadow-sm"
             >
               Daily
             </Button>
             <Button
-              variant={transactionType === "special" ? "default" : "secondary"}
+              variant={transactionType === recordTypeValues[1] ? "default" : "secondary"}
               size="sm"
-              onClick={() => setTransactionType("special")}
+              onClick={() => setTransactionType(recordTypeValues[1])}
               className="shadow-sm"
             >
               Special
@@ -161,7 +152,7 @@ export default function AccountInput() {
           <Button
             size="sm"
             className="w-fit px-4 shadow-sm"
-            disabled={authSession?.user === null || mutation.isPending}
+            disabled={!authSession?.userId || mutation.isPending}
             onClick={formSubmit}
           >Submit Record
           </Button>
