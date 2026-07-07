@@ -7,7 +7,13 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./drizzle",
   dbCredentials: {
-    url: process.env.POSTGRES_URL ?? process.env.POSTGRES_PRISMA_URL ?? "",
+    url: (() => {
+      const url = process.env.POSTGRES_URL ?? process.env.POSTGRES_PRISMA_URL;
+      if (!url) {
+        throw new Error("POSTGRES_URL or POSTGRES_PRISMA_URL must be set");
+      }
+      return url;
+    })(),
   },
   verbose: true,
   strict: true,

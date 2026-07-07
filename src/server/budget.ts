@@ -1,5 +1,5 @@
 import "server-only";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, lte } from "drizzle-orm";
 
 import type { CurrencyType } from "@/src/db/schema";
 
@@ -29,7 +29,10 @@ export type LatestBudgetPerCurrency = {
   currencyType: CurrencyType;
 };
 
-export async function getLatestBudgetsPerCurrency(userId: string): Promise<LatestBudgetPerCurrency[]> {
+export async function getLatestBudgetsPerCurrency(
+  userId: string,
+  currentMonthKey: number,
+): Promise<LatestBudgetPerCurrency[]> {
   const rows = await db
     .select({
       budgetAmount: userBudgetSettings.budgetAmount,
@@ -38,7 +41,10 @@ export async function getLatestBudgetsPerCurrency(userId: string): Promise<Lates
       timeToEffect: userBudgetSettings.timeToEffect,
     })
     .from(userBudgetSettings)
-    .where(eq(userBudgetSettings.userId, userId))
+    .where(and(
+      eq(userBudgetSettings.userId, userId),
+      lte(userBudgetSettings.timeToEffect, currentMonthKey),
+    ))
     .orderBy(desc(userBudgetSettings.timeToEffect), desc(userBudgetSettings.id));
 
   const seen = new Set<string>();

@@ -4,7 +4,7 @@ import { and, eq, gte, lt, sql } from "drizzle-orm";
 import type { CurrencyType } from "@/src/db/schema";
 
 import { db } from "@/src/db/client";
-import { accountRecords, recordType } from "@/src/db/schema";
+import { accountRecords, recordTypeValues } from "@/src/db/schema";
 
 import { getLatestBudgetsPerCurrency, hasAnyBudget } from "./budget";
 import { getCurrentMonthKey, getMonthRangeLocal } from "./dates";
@@ -63,12 +63,12 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
       .from(accountRecords)
       .where(and(
         eq(accountRecords.userId, userId),
-        eq(accountRecords.recordType, recordType.enumValues[0]),
+        eq(accountRecords.recordType, recordTypeValues[0]),
         gte(accountRecords.createdAt, monthStart),
         lt(accountRecords.createdAt, nextMonthStart),
       ))
       .groupBy(accountRecords.currencyType),
-    getLatestBudgetsPerCurrency(userId),
+    getLatestBudgetsPerCurrency(userId, currentMonthKey),
     hasAnyBudget(userId),
     getRecentRecordsPaginated(userId, 0),
   ]);

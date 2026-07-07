@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronsUpDown } from "lucide-react";
 import { use, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -41,41 +42,38 @@ export default function AccountInput() {
     if (e)
       e.preventDefault();
 
-    const amountText = (document.getElementById("amount-input") as HTMLInputElement)?.value || "";
-    const noteText = (document.getElementById("note-input") as HTMLInputElement)?.value || "";
-
-    const amount = amountText.trim();
-    if (!/^\d+(?:\.\d{1,2})?$/.test(amount)) {
-      toast.error("表单错误:金额格式不正确");
-      return;
-    }
-    if (Number(amount) <= 0) {
-      toast.error("表单错误:金额必须大于0");
-      return;
-    }
-    if (!currencyTypeValues.includes(currencyValue as typeof currencyTypeValues[number])) {
-      toast.error("表单错误:货币类型无效");
-      return;
-    }
-    if (!recordTypeValues.includes(transactionType as typeof recordTypeValues[number])) {
-      toast.error("表单错误:记录类型无效");
-      return;
-    }
-    if (noteText.length > 80) {
-      toast.error("表单错误:备注不能超过80字");
-      return;
-    }
     if (!authSession?.userId) {
       toast.error("表单错误:未登录");
       return;
     }
 
-    mutation.mutate({
-      amount,
-      currencyType: currencyValue as typeof currencyTypeValues[number],
-      note: noteText,
-      recordType: transactionType as typeof recordTypeValues[number],
+    const amountText = (document.getElementById("amount-input") as HTMLInputElement)?.value || "";
+    const noteText = (document.getElementById("note-input") as HTMLInputElement)?.value || "";
+
+    const recordSchema = z.object({
+      amount: z
+        .string()
+        .regex(/^\d+(?:\.\d{1,2})?$/, "金额格式不正确")
+        .refine(value => Number(value) > 0, "金额必须大于0"),
+      currencyType: z.enum(currencyTypeValues, { errorMap: () => ({ message: "货币类型无效" }) }),
+      note: z.string().max(80, "备注不能超过80字"),
+      recordType: z.enum(recordTypeValues, { errorMap: () => ({ message: "记录类型无效" }) }),
     });
+
+    const { data, error } = recordSchema.safeParse({
+      amount: amountText.trim(),
+      currencyType: currencyValue,
+      note: noteText,
+      recordType: transactionType,
+    });
+
+    if (error) {
+      const message = error.issues.map(issue => issue.message).join("; ");
+      toast.error(`表单错误:${message}`);
+      return;
+    }
+
+    mutation.mutate(data);
   };
 
   return (

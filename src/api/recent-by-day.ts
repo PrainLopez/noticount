@@ -2,11 +2,11 @@ import type { CurrencyType, RecordType } from "@/src/db/schema";
 
 export type RecentRecord = {
   amount: string;
-  created_at: string;
-  currency_type: CurrencyType;
+  createdAt: string;
+  currencyType: CurrencyType;
   id: number;
   note: string | null;
-  record_type: RecordType;
+  recordType: RecordType;
 };
 
 export type PaginatedRecords = {

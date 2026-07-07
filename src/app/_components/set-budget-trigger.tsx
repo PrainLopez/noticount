@@ -72,7 +72,11 @@ function createBudgetSchema(currentMonthKey: number) {
 }
 
 function isSmDownViewport(): boolean {
-  return false;
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return window.matchMedia("(max-width: 639px)").matches;
 }
 
 type BudgetFormProps = {

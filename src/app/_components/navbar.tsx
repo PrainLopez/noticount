@@ -1,13 +1,26 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { use } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import { AuthSessionCtx } from "../_context/auth-session-ctx";
+import { Button } from "@/components/ui/button";
+import { signOut } from "@/src/api/user";
+import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
 
 export default function Navbar() {
   const authSession = use(AuthSessionCtx);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.replace("/signin");
+    }
+    catch {
+      // signOut already toasted the error
+    }
+  };
 
   if (authSession?.userId) {
     return (
@@ -19,6 +32,9 @@ export default function Navbar() {
             <AvatarFallback>{(authSession.userName ?? authSession.email ?? "?").slice(0, 1).toUpperCase()}</AvatarFallback>
           </Avatar>
           <p className="">{authSession.userName ?? authSession.email}</p>
+          <Button size="sm" variant="outline" onClick={handleSignOut}>
+            Sign out
+          </Button>
         </div>
       </nav>
     );

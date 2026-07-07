@@ -55,7 +55,7 @@ function getRecordTypeColor(recordType: string): string {
 
 function groupRecordsByLocalDay(records: RecentRecord[]): GroupedRecords {
   return records.reduce((groups, record) => {
-    const date = new Date(record.created_at);
+    const date = new Date(record.createdAt);
     const localDay = date.toLocaleDateString("en-CA");
 
     if (!groups[localDay]) {
@@ -69,13 +69,13 @@ function groupRecordsByLocalDay(records: RecentRecord[]): GroupedRecords {
 
 function calculateDaySummary(records: RecentRecord[]): DaySummary {
   const totals = records.reduce((acc, record) => {
-    if (!acc[record.currency_type]) {
-      acc[record.currency_type] = {};
+    if (!acc[record.currencyType]) {
+      acc[record.currencyType] = {};
     }
-    if (!acc[record.currency_type][record.record_type]) {
-      acc[record.currency_type][record.record_type] = 0;
+    if (!acc[record.currencyType][record.recordType]) {
+      acc[record.currencyType][record.recordType] = 0;
     }
-    acc[record.currency_type][record.record_type] += Number(record.amount);
+    acc[record.currencyType][record.recordType] += Number(record.amount);
     return acc;
   }, {} as CurrencyTotals);
 
@@ -274,12 +274,12 @@ export default function RecordListPage() {
                         return (
                           <TableRow key={record.id} className="grid grid-cols-[2fr_1fr_3fr] ov">
                             <TableCell className="font-semibold gap-1 flex items-center">
-                              <span>{currencySymbols[record.currency_type] || record.currency_type}</span>
+                              <span>{currencySymbols[record.currencyType] || record.currencyType}</span>
                               <span>{Number(record.amount).toFixed(2)}</span>
                             </TableCell>
                             <TableCell className="">
-                              <span className={`text-xs px-2 py-1 rounded-full ${getRecordTypeColor(record.record_type)}`}>
-                                {record.record_type}
+                              <span className={`text-xs px-2 py-1 rounded-full ${getRecordTypeColor(record.recordType)}`}>
+                                {record.recordType}
                               </span>
                             </TableCell>
                             <TableCell className="text-muted-foreground text-ellipsis overflow-hidden">

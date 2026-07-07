@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, lt, lte, sql } from "drizzle-orm";
 
 import type { CurrencyType, RecordType } from "@/src/db/schema";
 
@@ -94,7 +94,7 @@ export async function hasRecordsOlderThan(
     .from(accountRecords)
     .where(and(
       eq(accountRecords.userId, userId),
-      lte(accountRecords.createdAt, date),
+      lt(accountRecords.createdAt, date),
     ))
     .limit(1);
 

@@ -35,14 +35,15 @@ export async function getAuthSnapshot(): Promise<AuthSnapshot> {
     return null;
   }
 
-  const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
+  const userMetadata = (data.user.user_metadata ?? {}) as Record<string, unknown>;
+  const appMetadata = (data.user.app_metadata ?? {}) as Record<string, unknown>;
 
   return {
-    avatarUrl: stringOrNull(meta.avatar_url),
+    avatarUrl: stringOrNull(userMetadata.avatar_url),
     email: data.user.email ?? null,
-    provider: providerFromUserMeta(meta),
+    provider: providerFromUserMeta(appMetadata),
     userId: data.user.id,
-    userName: stringOrNull(meta.user_name) ?? stringOrNull(meta.full_name) ?? stringOrNull(meta.preferred_username),
+    userName: stringOrNull(userMetadata.user_name) ?? stringOrNull(userMetadata.full_name) ?? stringOrNull(userMetadata.preferred_username),
   };
 }
 

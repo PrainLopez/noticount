@@ -22,3 +22,15 @@ export function useSession() {
     },
   });
 }
+
+export async function signOut(): Promise<void> {
+  const response = await fetch("/api/auth/signout", {
+    method: "POST",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const message = `Sign out failed: ${response.status}`;
+    toast.error(message);
+    throw new Error(message);
+  }
+}
