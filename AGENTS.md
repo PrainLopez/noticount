@@ -24,6 +24,7 @@
 | `pnpm start`    | 启动生产服务         |
 | `pnpm lint`     | ESLint 检查 + 格式规则 |
 | `pnpm lint:fix` | 自动修复可修项       |
+| `pnpm test`     | Vitest 单元测试      |
 | `pnpm supabase:type` | 生成 Supabase 类型定义 |
 
 仓库无独立 Prettier。格式化交给 **ESLint**（`@antfu/eslint-config` + `formatters: true` + `eslint-plugin-format`）。文档和风格冲突时，听 `pnpm lint`。
@@ -63,7 +64,7 @@ src/app/                 # App Router：页面与布局
       @list/page.tsx
   _components/           # 如 auth-check、navbar、set-budget-trigger（非 route segment）
   _context/              # 如 auth-session
-src/api/                 # 与 Supabase 的查询/变更封装（如 usage、user-budget-settings）
+src/api/                 # 与 Supabase 的查询/变更封装（如 usage、user-budget-settings、monthly-settlements）
 src/styles/              # 全局样式
 components/ui/           # shadcn 风格 UI 组件（含 drawer）
 lib/                     # supabase 客户端、utils、supabase.type.ts
@@ -114,6 +115,13 @@ flowchart LR
   - `daily` 用蓝色系，`special` 用紫色系。
   - 排序：先按币种 `CNY → GBP → USD → EUR → JPY`，同一币种下 `daily` 在前、`special` 在后。
   - 金额始终保留两位小数，并附带对应币种符号。
+- **跨月结转（carryover）**：预算结余逐月累计（超支记负结余，同样累计），永不失效。采用**惰性结算**：
+  - `monthly_budget_settlements` 表存储已结算月份（每行 = 某币种某月的 `budget_amount` / `spend_amount`，不存累计值，累计在代码中求和）。
+  - `getUsageSummary`（`src/api/usage.ts`）执行时检测未结算的历史月份，计算并 upsert 写入（`(user_id, currency_type, month_key)` 唯一约束 + `ignoreDuplicates` 保证幂等），无 cron、无 RPC。
+  - **宽限期**：`GRACE_MONTHS = 1`，只有上上月及更早的月份才归档结算；**上个月**和**本月**始终按明细实时计算。
+  - 某月结算预算 = 该月有效预算（`time_to_effect <= 该月` 中 `time_to_effect` 最大、`id` 最大的一条）。
+  - 月份归属按浏览器本地时区分桶，与 `YYYYMM` month key 口径一致；月份键工具为 `addMonthsKey`。
+  - UI 不单独展示结余；进度条分母为 `totalAvailable = 本月预算 + 累计结余`，`usagePercent` 基于 `totalAvailable` 计算。
 
 ## Git 与提交
 
@@ -122,7 +130,7 @@ flowchart LR
 
 ## 测试
 
-当前仓库**未配**单元测试运行器（如 Vitest/Jest）。要补测试，建议按现有 ESLint/TS 工具链引入。
+测试运行器为 **Vitest**（`vitest.config.mts`，配了 `@/` 别名并通过 `process.loadEnvFile()` 加载 `.env`）。单测放在被测模块旁（如 `src/api/usage.test.ts`），优先覆盖纯函数。运行：`pnpm test`。
 
 ### 冒烟测试
 

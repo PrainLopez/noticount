@@ -138,7 +138,7 @@ export default function UsagePage() {
                 <p className="text-xs text-muted-foreground text-right">
                   {currencySymbols[item.currencyType] || item.currencyType}
                   {item.monthTotal.toFixed(2)} / {currencySymbols[item.currencyType] || item.currencyType}
-                  {item.budgetAmount.toFixed(2)}
+                  {item.totalAvailable.toFixed(2)}
                 </p>
               </div>
             );
