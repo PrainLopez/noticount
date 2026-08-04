@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      monthly_budget_settlements: {
+        Row: {
+          budget_amount: number
+          created_at: string
+          currency_type: string
+          id: number
+          month_key: number
+          spend_amount: number
+          user_id: string
+        }
+        Insert: {
+          budget_amount: number
+          created_at?: string
+          currency_type: string
+          id?: never
+          month_key: number
+          spend_amount: number
+          user_id: string
+        }
+        Update: {
+          budget_amount?: number
+          created_at?: string
+          currency_type?: string
+          id?: never
+          month_key?: number
+          spend_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_budget_settings: {
         Row: {
           budget_amount: number
@@ -76,7 +106,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      ensure_monthly_savings_records: { Args: never; Returns: undefined }
+      get_local_month_range: {
+        Args: { p_month_key: number; p_timezone: string }
+        Returns: {
+          month_end: string
+          month_start: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
