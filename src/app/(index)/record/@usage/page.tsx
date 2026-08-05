@@ -26,13 +26,7 @@ export default function UsagePage() {
     isError,
   } = useQuery({
     queryKey: ["usage", authSession?.user?.id],
-    queryFn: () => {
-      if (!authSession?.user?.id) {
-        return Promise.reject(new Error("User not authenticated"));
-      }
-
-      return getUsageSummary(authSession.user.id);
-    },
+    queryFn: () => getUsageSummary(),
     enabled: !!authSession?.user?.id,
   });
 

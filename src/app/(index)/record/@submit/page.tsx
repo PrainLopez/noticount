@@ -31,7 +31,6 @@ export default function AccountInput() {
     record_type: z.enum(recordType as [string, ...string[]], {
       errorMap: () => ({ message: "记录类型无效" }),
     }),
-    user_id: z.string().uuid("用户ID无效"),
   });
 
   const [currentComboboxOpen, setCurrentComboboxOpen] = useState(false);
@@ -74,7 +73,6 @@ export default function AccountInput() {
       currency_type: currencyValue,
       note,
       record_type: transactionType,
-      user_id: authSession?.user.id || "",
     });
 
     if (error) {

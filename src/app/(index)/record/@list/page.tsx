@@ -134,12 +134,7 @@ export default function RecordListPage() {
     isError,
   } = useInfiniteQuery({
     queryKey: ["account-records", authSession?.user?.id],
-    queryFn: ({ pageParam = 0 }) => {
-      if (!authSession?.user?.id) {
-        return Promise.reject(new Error("User not authenticated"));
-      }
-      return getRecentRecordsPaginated(authSession.user.id, pageParam);
-    },
+    queryFn: ({ pageParam = 0 }) => getRecentRecordsPaginated(pageParam),
     getNextPageParam: (lastPage) => {
       return lastPage.hasMore ? lastPage.nextPage : undefined;
     },

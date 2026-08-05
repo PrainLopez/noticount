@@ -81,6 +81,7 @@ lib/                     # supabase 客户端、utils、supabase.type.ts
 - 浏览器客户端：**[`lib/supabase.ts`](lib/supabase.ts)**，用 **`Database`** 类型（[`lib/supabase.type.ts`](lib/supabase.type.ts)）。
 - 核心表 **`account_records`**：含 `amount`、`currency_type`、`record_type`、`note`、`user_id`、`created_at` 等（以类型定义为准）。
 - 在 Supabase 控制台配 **RLS**，按用户隔离。客户端用 **anon key** 时权限受策略控制。若后续引入 **service role**，只放可信服务端，**不要**暴露浏览器。
+- `src/api/` 的查询/变更函数经 [`src/api/session-user.ts`](src/api/session-user.ts) 的 `requireSessionUserId()` 从当前会话派生 uid 后做过滤/盖章。**页面/组件不得传 `userId`**；仅 `src/api/` 内部允许把刚由 `requireSessionUserId()` 取得的 uid 传给同层函数（可选参数），以保证单次操作内 uid 一致。
 
 ## 认证与客户端数据
 

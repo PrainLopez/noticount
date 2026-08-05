@@ -68,7 +68,6 @@ function createBudgetSchema(currentMonthKey: number) {
         const month = value % 100;
         return month >= 1 && month <= 12;
       }, "Month must be between 01 and 12"),
-    user_id: z.string().uuid("User ID is invalid"),
   });
 }
 
@@ -227,7 +226,6 @@ export default function SetBudgetTrigger({ currentMonthKey, isFirstSetup }: SetB
       budget_amount: Number(budgetAmountValue),
       currency_type: currencyValue,
       time_to_effect: monthToUse,
-      user_id: authSession.user.id,
     });
 
     if (error) {

@@ -3,6 +3,7 @@ import type { MonthlySettlement } from "@/src/api/monthly-settlements";
 import { supabase } from "@/lib/supabase";
 import { getMonthlySettlements, upsertMonthlySettlements } from "@/src/api/monthly-settlements";
 import { getRecentRecordsPaginated } from "@/src/api/recent-by-day";
+import { requireSessionUserId } from "@/src/api/session-user";
 
 type AmountRecord = {
   amount: number;
@@ -110,7 +111,6 @@ export function buildSettlementRows(input: {
   budgetTimeline: Record<string, BudgetChange[]>;
   pendingByCurrency: Record<string, number[]>;
   spendByCurrencyMonth: Record<string, Record<number, number>>;
-  userId: string;
 }): MonthlySettlement[] {
   const rows: MonthlySettlement[] = [];
 
@@ -125,7 +125,6 @@ export function buildSettlementRows(input: {
         currency_type: currencyType,
         month_key: monthKey,
         spend_amount: input.spendByCurrencyMonth[currencyType]?.[monthKey] ?? 0,
-        user_id: input.userId,
       });
     }
   }
@@ -189,7 +188,9 @@ export function sumSettledDeltaByCurrency(rows: MonthlySettlement[]): Record<str
   }, {} as Record<string, number>);
 }
 
-export async function getUsageSummary(userId: string): Promise<UsageSummary> {
+export async function getUsageSummary(): Promise<UsageSummary> {
+  const userId = await requireSessionUserId();
+
   const now = new Date();
   const currentMonthKey = getMonthKey(now);
   const prevMonthKey = addMonthsKey(currentMonthKey, -1);
@@ -214,7 +215,7 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
         .eq("user_id", userId)
         .limit(1),
       getMonthlySettlements(userId),
-      getRecentRecordsPaginated(userId, 0),
+      getRecentRecordsPaginated(0, userId),
     ]);
 
   if (budgetError) {
@@ -273,8 +274,8 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
   const spendByCurrencyMonth = toMonthBucketsByCurrency((detailData ?? []) as DailyExpenseRecord[]);
 
   // 惰性结算：归档行幂等 upsert，靠 (user_id, currency_type, month_key) 唯一约束去重
-  const newSettlementRows = buildSettlementRows({ budgetTimeline, pendingByCurrency, spendByCurrencyMonth, userId });
-  await upsertMonthlySettlements(newSettlementRows);
+  const newSettlementRows = buildSettlementRows({ budgetTimeline, pendingByCurrency, spendByCurrencyMonth });
+  await upsertMonthlySettlements(newSettlementRows, userId);
 
   // 上月按明细实时计算，构造成虚拟结算行与归档累计一起求和
   const prevMonthPending = Object.fromEntries(budgetCurrencies.map(currencyType => [currencyType, [prevMonthKey]]));
@@ -282,7 +283,6 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
     budgetTimeline,
     pendingByCurrency: prevMonthPending,
     spendByCurrencyMonth,
-    userId,
   });
 
   const carryoverByCurrency = sumSettledDeltaByCurrency([...settledRows, ...newSettlementRows, ...prevMonthRows]);

@@ -9,8 +9,6 @@ import {
   sumSettledDeltaByCurrency,
 } from "./usage";
 
-const USER_ID = "user-1";
-
 function budgetRow(id: number, amount: number, monthKey: number, currencyType = "CNY") {
   return {
     budget_amount: amount,
@@ -128,14 +126,13 @@ describe("buildSettlementRows", () => {
       budgetTimeline: timeline,
       pendingByCurrency: { CNY: [202604, 202605, 202606] },
       spendByCurrencyMonth: { CNY: { 202604: 800, 202606: 2000 } },
-      userId: USER_ID,
     });
 
     expect(rows).toEqual([
-      { budget_amount: 1000, currency_type: "CNY", month_key: 202604, spend_amount: 800, user_id: USER_ID },
+      { budget_amount: 1000, currency_type: "CNY", month_key: 202604, spend_amount: 800 },
       // 零开销月：全额结转
-      { budget_amount: 1000, currency_type: "CNY", month_key: 202605, spend_amount: 0, user_id: USER_ID },
-      { budget_amount: 1500, currency_type: "CNY", month_key: 202606, spend_amount: 2000, user_id: USER_ID },
+      { budget_amount: 1000, currency_type: "CNY", month_key: 202605, spend_amount: 0 },
+      { budget_amount: 1500, currency_type: "CNY", month_key: 202606, spend_amount: 2000 },
     ]);
   });
 
@@ -149,11 +146,10 @@ describe("buildSettlementRows", () => {
       budgetTimeline: timeline,
       pendingByCurrency: { CNY: [202606] },
       spendByCurrencyMonth: {},
-      userId: USER_ID,
     });
 
     expect(rows).toEqual([
-      { budget_amount: 1800, currency_type: "CNY", month_key: 202606, spend_amount: 0, user_id: USER_ID },
+      { budget_amount: 1800, currency_type: "CNY", month_key: 202606, spend_amount: 0 },
     ]);
   });
 
@@ -167,11 +163,10 @@ describe("buildSettlementRows", () => {
       budgetTimeline: timeline,
       pendingByCurrency: { CNY: [202606] },
       spendByCurrencyMonth: {},
-      userId: USER_ID,
     });
 
     expect(rows).toEqual([
-      { budget_amount: 1000, currency_type: "CNY", month_key: 202606, spend_amount: 0, user_id: USER_ID },
+      { budget_amount: 1000, currency_type: "CNY", month_key: 202606, spend_amount: 0 },
     ]);
   });
 
@@ -182,7 +177,6 @@ describe("buildSettlementRows", () => {
       budgetTimeline: timeline,
       pendingByCurrency: { CNY: [202606] },
       spendByCurrencyMonth: {},
-      userId: USER_ID,
     });
 
     expect(rows).toEqual([]);
@@ -192,10 +186,10 @@ describe("buildSettlementRows", () => {
 describe("sumSettledDeltaByCurrency", () => {
   it("accumulates surplus and overspend per currency", () => {
     const delta = sumSettledDeltaByCurrency([
-      { budget_amount: 1000, currency_type: "CNY", month_key: 202604, spend_amount: 800, user_id: USER_ID },
-      { budget_amount: 1000, currency_type: "CNY", month_key: 202605, spend_amount: 0, user_id: USER_ID },
-      { budget_amount: 1500, currency_type: "CNY", month_key: 202606, spend_amount: 2000, user_id: USER_ID },
-      { budget_amount: 500, currency_type: "USD", month_key: 202606, spend_amount: 600, user_id: USER_ID },
+      { budget_amount: 1000, currency_type: "CNY", month_key: 202604, spend_amount: 800 },
+      { budget_amount: 1000, currency_type: "CNY", month_key: 202605, spend_amount: 0 },
+      { budget_amount: 1500, currency_type: "CNY", month_key: 202606, spend_amount: 2000 },
+      { budget_amount: 500, currency_type: "USD", month_key: 202606, spend_amount: 600 },
     ]);
 
     expect(delta).toEqual({ CNY: 700, USD: -100 });
@@ -280,7 +274,6 @@ describe("carryover scenarios", () => {
       budgetTimeline: timeline,
       pendingByCurrency: { CNY: [202607] },
       spendByCurrencyMonth,
-      userId: USER_ID,
     });
     const carryover = sumSettledDeltaByCurrency(prevMonthRows);
 
@@ -304,7 +297,7 @@ describe("carryover scenarios", () => {
       budgetRow(2, 1500, 202606),
     ]);
     const settledFromDb = [
-      { budget_amount: 1000, currency_type: "CNY", month_key: 202604, spend_amount: 1100, user_id: USER_ID },
+      { budget_amount: 1000, currency_type: "CNY", month_key: 202604, spend_amount: 1100 },
     ];
     const spendByCurrencyMonth = { CNY: { 202605: 500, 202606: 1500, 202607: 1200 } };
 
@@ -319,13 +312,11 @@ describe("carryover scenarios", () => {
       budgetTimeline: timeline,
       pendingByCurrency: pending,
       spendByCurrencyMonth,
-      userId: USER_ID,
     });
     const prevMonthRows = buildSettlementRows({
       budgetTimeline: timeline,
       pendingByCurrency: { CNY: [202607] },
       spendByCurrencyMonth,
-      userId: USER_ID,
     });
 
     // 202604: -100, 202605: +500, 202606: 0, 202607: +300

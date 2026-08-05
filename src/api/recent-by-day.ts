@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { requireSessionUserId } from "@/src/api/session-user";
 
 export type RecentRecord = {
   amount: number;
@@ -39,15 +40,16 @@ function get7DayRangeLocal(page: number): { start: Date; end: Date } {
 }
 
 export async function getRecentRecordsPaginated(
-  userId: string,
   page: number = 0,
+  userId?: string,
 ): Promise<PaginatedRecords> {
+  const uid = userId ?? await requireSessionUserId();
   const { start, end } = get7DayRangeLocal(page);
 
   const { data, error } = await supabase
     .from("account_records")
     .select("*")
-    .eq("user_id", userId)
+    .eq("user_id", uid)
     .gte("created_at", start.toISOString())
     .lte("created_at", end.toISOString())
     .order("created_at", { ascending: false });
@@ -61,7 +63,7 @@ export async function getRecentRecordsPaginated(
   const { data: nextData } = await supabase
     .from("account_records")
     .select("id")
-    .eq("user_id", userId)
+    .eq("user_id", uid)
     .gte("created_at", nextRange.start.toISOString())
     .lte("created_at", nextRange.end.toISOString())
     .limit(1);
