@@ -5,6 +5,7 @@ import {
   buildBudgetTimeline,
   buildSettlementRows,
   buildUsageItem,
+  getMonthElapsedPercent,
   planPendingSettlements,
   sumSettledDeltaByCurrency,
 } from "./usage";
@@ -30,6 +31,28 @@ describe("addMonthsKey", () => {
 
   it("crosses the year boundary backward", () => {
     expect(addMonthsKey(202601, -2)).toBe(202511);
+  });
+});
+
+describe("getMonthElapsedPercent", () => {
+  it("returns the day-of-month ratio for a mid-month date", () => {
+    expect(getMonthElapsedPercent(new Date(2026, 7, 6))).toBeCloseTo((6 / 31) * 100);
+  });
+
+  it("returns 100 on the last day of the month", () => {
+    expect(getMonthElapsedPercent(new Date(2026, 7, 31))).toBe(100);
+  });
+
+  it("returns 50 mid-February in a non-leap year", () => {
+    expect(getMonthElapsedPercent(new Date(2026, 1, 14))).toBe(50);
+  });
+
+  it("returns 100 on Feb 29 in a leap year", () => {
+    expect(getMonthElapsedPercent(new Date(2024, 1, 29))).toBe(100);
+  });
+
+  it("returns the first-day ratio on the 1st", () => {
+    expect(getMonthElapsedPercent(new Date(2026, 3, 1))).toBeCloseTo((1 / 30) * 100);
   });
 });
 
