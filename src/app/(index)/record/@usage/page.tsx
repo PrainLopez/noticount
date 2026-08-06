@@ -123,7 +123,7 @@ export default function UsagePage() {
                   <span className="text-muted-foreground">{item.currencyType}</span>
                   <span className="font-semibold">{percentText}</span>
                 </div>
-                <ProgressBar markerPercent={data.monthElapsedPercent} percent={item.usagePercent} />
+                <ProgressBar ariaLabel={`${item.currencyType} monthly budget usage`} markerPercent={data.monthElapsedPercent} percent={item.usagePercent} />
                 <p className="text-xs text-muted-foreground text-right">
                   {currencySymbols[item.currencyType] || item.currencyType}
                   {item.monthTotal.toFixed(2)} / {currencySymbols[item.currencyType] || item.currencyType}
