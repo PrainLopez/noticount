@@ -40,6 +40,7 @@ export type UsageSummary = {
   hasBudget: boolean;
   isFirstSetup: boolean;
   items: UsageSummaryItem[];
+  monthElapsedPercent: number;
 };
 
 // 上个月始终按明细实时计算，只有上上月及更早才归档结算
@@ -55,6 +56,12 @@ function getMonthStartFromKey(monthKey: number): Date {
   const year = Math.floor(monthKey / 100);
   const monthIndex = (monthKey % 100) - 1;
   return new Date(year, monthIndex, 1, 0, 0, 0, 0);
+}
+
+// 本月时间进度：今天（含）是当月第几天 / 当月总天数，本地时区
+export function getMonthElapsedPercent(date: Date): number {
+  const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  return (date.getDate() / daysInMonth) * 100;
 }
 
 function toMapByCurrency(records: AmountRecord[]): Record<string, number> {
@@ -194,6 +201,7 @@ export async function getUsageSummary(): Promise<UsageSummary> {
   const now = new Date();
   const currentMonthKey = getMonthKey(now);
   const prevMonthKey = addMonthsKey(currentMonthKey, -1);
+  const monthElapsedPercent = getMonthElapsedPercent(now);
 
   const [
     { data: budgetData, error: budgetError },
@@ -244,6 +252,7 @@ export async function getUsageSummary(): Promise<UsageSummary> {
       hasBudget: false,
       isFirstSetup,
       items: [],
+      monthElapsedPercent,
     };
   }
 
@@ -305,5 +314,6 @@ export async function getUsageSummary(): Promise<UsageSummary> {
     hasBudget: true,
     isFirstSetup,
     items,
+    monthElapsedPercent,
   };
 }

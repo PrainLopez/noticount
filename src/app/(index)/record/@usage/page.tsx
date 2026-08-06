@@ -6,6 +6,7 @@ import { use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUsageSummary } from "@/src/api/usage";
+import ProgressBar from "@/src/app/_components/progress-bar";
 import SetBudgetTrigger from "@/src/app/_components/set-budget-trigger";
 import { AuthSessionCtx } from "@/src/app/_context/auth-session-ctx";
 
@@ -115,7 +116,6 @@ export default function UsagePage() {
           <p className="text-sm font-semibold">Monthly Budget Usage (Daily)</p>
           {data.items.map((item) => {
             const percentText = `${item.usagePercent.toFixed(1)}%`;
-            const progressPercent = Math.min(item.usagePercent, 100);
 
             return (
               <div key={`budget-${item.currencyType}`} className="space-y-1">
@@ -123,12 +123,7 @@ export default function UsagePage() {
                   <span className="text-muted-foreground">{item.currencyType}</span>
                   <span className="font-semibold">{percentText}</span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-primary transition-[width]"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
+                <ProgressBar markerPercent={data.monthElapsedPercent} percent={item.usagePercent} />
                 <p className="text-xs text-muted-foreground text-right">
                   {currencySymbols[item.currencyType] || item.currencyType}
                   {item.monthTotal.toFixed(2)} / {currencySymbols[item.currencyType] || item.currencyType}

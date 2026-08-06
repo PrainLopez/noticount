@@ -62,7 +62,7 @@ src/app/                 # App Router：页面与布局
       @submit/page.tsx
       @usage/page.tsx
       @list/page.tsx
-  _components/           # 如 auth-check、navbar、set-budget-trigger（非 route segment）
+  _components/           # 如 auth-check、navbar、set-budget-trigger、progress-bar（非 route segment）
   _context/              # 如 auth-session
 src/api/                 # 与 Supabase 的查询/变更封装（如 usage、user-budget-settings、monthly-settlements）
 src/styles/              # 全局样式
@@ -123,6 +123,7 @@ flowchart LR
   - 某月结算预算 = 该月有效预算（`time_to_effect <= 该月` 中 `time_to_effect` 最大、`id` 最大的一条）。
   - 月份归属按浏览器本地时区分桶，与 `YYYYMM` month key 口径一致；月份键工具为 `addMonthsKey`。
   - UI 不单独展示结余；进度条分母为 `totalAvailable = 本月预算 + 累计结余`，`usagePercent` 基于 `totalAvailable` 计算。
+- **进度条时间进度标记**：`/record/@usage` 的进度条由 [`src/app/_components/progress-bar.tsx`](src/app/_components/progress-bar.tsx) 的 `ProgressBar` 渲染，可选参数 `markerPercent` 在对应百分比位置渲染一条竖线标记（不传则不渲染）。标记与进度条等高，两侧用 `mask-image` 渐变把轨道/填充抠出透明小缺口（不依赖表面色），线色统一为 `green-600`。注意本项目的深浅色主题靠 `prefers-color-scheme` 媒体查询驱动，没有 `.dark` 类，因此 class 式的 `dark:` 变体不生效。@usage 传入的是 `UsageSummary.monthElapsedPercent`（[`src/api/usage.ts`](src/api/usage.ts) 的 `getMonthElapsedPercent`）：今天（含）是当月第几天 / 当月总天数，浏览器本地时区，用于对比消费进度与时间进度。
 
 ## Git 与提交
 
