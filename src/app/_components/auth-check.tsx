@@ -16,7 +16,7 @@ export default function AuthCheck({ children }: { children: React.ReactNode }) {
       return;
     }
     if (error) {
-      toast.warning(`Error fetching session: ${error.message}`);
+      toast.warning(`Error fetching session: ${error.message ?? `status ${error.status ?? "unknown"}`}`);
     }
     if (!session) {
       router.replace("/signin");
