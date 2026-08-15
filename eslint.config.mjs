@@ -49,4 +49,11 @@ antfu(
       "node/no-process-env": "off",
     },
   },
+  {
+    files: ["drizzle.config.ts", "scripts/**/*.ts"],
+    rules: {
+      "node/no-process-env": "off",
+      "no-console": "off",
+    },
+  },
 );

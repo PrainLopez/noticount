@@ -1,5 +1,5 @@
-import type { Session } from "@supabase/supabase-js";
-
 import { createContext } from "react";
 
-export const AuthSessionCtx = createContext<Session | null>(null);
+import type { AuthSession } from "@/lib/auth-client";
+
+export const AuthSessionCtx = createContext<AuthSession | null>(null);

@@ -1,5 +1,4 @@
-import { supabase } from "@/lib/supabase";
-import { requireSessionUserId } from "@/src/api/session-user";
+import { fetchJson, postJson } from "@/src/api/fetch-json";
 
 type AccountRecordInsertData = {
   amount: number;
@@ -8,14 +7,6 @@ type AccountRecordInsertData = {
   record_type: string;
 };
 
-export async function insertAccountRecord(input: AccountRecordInsertData) {
-  const userId = await requireSessionUserId();
-
-  const { error } = await supabase
-    .from("account_records")
-    .insert({ ...input, user_id: userId });
-
-  if (error) {
-    throw error;
-  }
+export async function insertAccountRecord(input: AccountRecordInsertData): Promise<void> {
+  await fetchJson("/api/records", postJson(input));
 }

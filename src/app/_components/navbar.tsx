@@ -5,7 +5,7 @@ import { use } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { supabase } from "@/lib/supabase";
+import { authClient } from "@/lib/auth-client";
 
 import { AuthSessionCtx } from "../_context/auth-session-ctx";
 
@@ -13,7 +13,7 @@ export default function Navbar() {
   const authSession = use(AuthSessionCtx);
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await authClient.signOut();
     if (error) {
       console.error("Error signing out:", error.message);
     }
@@ -26,11 +26,11 @@ export default function Navbar() {
         <HoverCard>
           <HoverCardTrigger>
             <Avatar className="m-2">
-              <AvatarImage src={authSession.user.user_metadata.avatar_url} />
+              <AvatarImage src={authSession.user.image ?? undefined} />
             </Avatar>
           </HoverCardTrigger>
           <HoverCardContent className="mx-4 flex flex-row items-center gap-4 justify-between">
-            <p className="">{authSession.user.user_metadata.user_name}</p>
+            <p className="">{authSession.user.name}</p>
             <Button
               variant="default"
               onClick={handleSignOut}

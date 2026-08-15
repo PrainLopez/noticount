@@ -7,39 +7,28 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/lib/supabase";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
 
+  const { data: session, isPending } = authClient.useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      // console.log(data?.session?.user ?? "No user session");
-
-      if (error) {
-        console.error("Error fetching session:", error.message);
-        return;
-      }
-      if (data?.session?.user) {
-        router.replace("/record");
-      }
-    };
-    checkSession();
-  }, [router]);
+    if (!isPending && session) {
+      router.replace("/record");
+    }
+  }, [session, isPending, router]);
 
   const signIn = async (options: "github" | "anonymous") => {
     setIsLoading(true);
 
     switch (options) {
       case "github": {
-        const { error } = await supabase.auth.signInWithOAuth({
+        const { error } = await authClient.signIn.social({
           provider: "github",
-          options: {
-            redirectTo: `${window.location.origin}/signin`,
-          },
+          callbackURL: "/record",
         });
 
         if (error) {
@@ -48,7 +37,7 @@ export default function LoginPage() {
         break;
       }
       case "anonymous": {
-        const { error } = await supabase.auth.signInAnonymously();
+        const { error } = await authClient.signIn.anonymous();
 
         if (error) {
           toast.error(`Error signing in: ${error.message}`);

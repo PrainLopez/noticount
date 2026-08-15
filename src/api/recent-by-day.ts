@@ -1,5 +1,4 @@
-import { supabase } from "@/lib/supabase";
-import { requireSessionUserId } from "@/src/api/session-user";
+import { fetchJson } from "@/src/api/fetch-json";
 
 export type RecentRecord = {
   amount: number;
@@ -39,39 +38,24 @@ function get7DayRangeLocal(page: number): { start: Date; end: Date } {
   return { start, end };
 }
 
-export async function getRecentRecordsPaginated(
-  page: number = 0,
-  userId?: string,
-): Promise<PaginatedRecords> {
-  const uid = userId ?? await requireSessionUserId();
+// 7 天窗口在浏览器本地时区计算后作为 ISO 区间传给服务端，由服务端按区间过滤
+export async function getRecentRecordsPaginated(page: number = 0): Promise<PaginatedRecords> {
   const { start, end } = get7DayRangeLocal(page);
-
-  const { data, error } = await supabase
-    .from("account_records")
-    .select("*")
-    .eq("user_id", uid)
-    .gte("created_at", start.toISOString())
-    .lte("created_at", end.toISOString())
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    return Promise.reject(error);
-  }
-
-  // Check if there are records in the next 7-day period
   const nextRange = get7DayRangeLocal(page + 1);
-  const { data: nextData } = await supabase
-    .from("account_records")
-    .select("id")
-    .eq("user_id", uid)
-    .gte("created_at", nextRange.start.toISOString())
-    .lte("created_at", nextRange.end.toISOString())
-    .limit(1);
 
-  const hasMore = (nextData?.length ?? 0) > 0;
+  const params = new URLSearchParams({
+    start: start.toISOString(),
+    end: end.toISOString(),
+    nextStart: nextRange.start.toISOString(),
+    nextEnd: nextRange.end.toISOString(),
+  });
+
+  const { data, hasMore } = await fetchJson<{ data: RecentRecord[]; hasMore: boolean }>(
+    `/api/records/recent?${params.toString()}`,
+  );
 
   return {
-    data: data || [],
+    data,
     hasMore,
     nextPage: page + 1,
     dateRangeStart: start.toISOString(),

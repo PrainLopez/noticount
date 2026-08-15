@@ -1,5 +1,4 @@
-import { supabase } from "@/lib/supabase";
-import { requireSessionUserId } from "@/src/api/session-user";
+import { fetchJson, postJson } from "@/src/api/fetch-json";
 
 type BudgetSettingInsertData = {
   budget_amount: number;
@@ -7,14 +6,6 @@ type BudgetSettingInsertData = {
   time_to_effect: number;
 };
 
-export async function insertBudgetSetting(input: BudgetSettingInsertData) {
-  const userId = await requireSessionUserId();
-
-  const { error } = await supabase
-    .from("user_budget_settings")
-    .insert({ ...input, user_id: userId });
-
-  if (error) {
-    throw error;
-  }
+export async function insertBudgetSetting(input: BudgetSettingInsertData): Promise<void> {
+  await fetchJson("/api/budget-settings", postJson(input));
 }
