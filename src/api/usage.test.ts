@@ -222,53 +222,51 @@ describe("sumSettledDeltaByCurrency", () => {
 describe("buildUsageItem", () => {
   it("equals the plain budget when there is no carryover", () => {
     const item = buildUsageItem({
-      avgLast7Days: 0,
       budgetAmount: 1000,
       carryover: 0,
       currencyType: "CNY",
       monthTotal: 300,
     });
 
+    expect(item.carryover).toBe(0);
     expect(item.totalAvailable).toBe(1000);
     expect(item.usagePercent).toBeCloseTo(30);
   });
 
   it("adds positive carryover to the available total", () => {
     const item = buildUsageItem({
-      avgLast7Days: 0,
       budgetAmount: 1000,
       carryover: 700,
       currencyType: "CNY",
       monthTotal: 510,
     });
 
+    expect(item.carryover).toBe(700);
     expect(item.totalAvailable).toBe(1700);
     expect(item.usagePercent).toBeCloseTo(30);
   });
 
   it("subtracts overspend carryover from the available total", () => {
     const item = buildUsageItem({
-      avgLast7Days: 0,
       budgetAmount: 1000,
       carryover: -200,
       currencyType: "CNY",
       monthTotal: 400,
     });
 
+    expect(item.carryover).toBe(-200);
     expect(item.totalAvailable).toBe(800);
     expect(item.usagePercent).toBeCloseTo(50);
   });
 
   it("reports 100% when the total available is not positive", () => {
     const negative = buildUsageItem({
-      avgLast7Days: 0,
       budgetAmount: 1000,
       carryover: -1500,
       currencyType: "CNY",
       monthTotal: 400,
     });
     const zero = buildUsageItem({
-      avgLast7Days: 0,
       budgetAmount: 1000,
       carryover: -1000,
       currencyType: "CNY",
@@ -303,7 +301,6 @@ describe("carryover scenarios", () => {
     expect(carryover.CNY).toBe(-200);
 
     const item = buildUsageItem({
-      avgLast7Days: 0,
       budgetAmount: 1000,
       carryover: carryover.CNY,
       currencyType: "CNY",
@@ -347,7 +344,6 @@ describe("carryover scenarios", () => {
     expect(carryover.CNY).toBe(700);
 
     const item = buildUsageItem({
-      avgLast7Days: 0,
       budgetAmount: 1500,
       carryover: carryover.CNY,
       currencyType: "CNY",

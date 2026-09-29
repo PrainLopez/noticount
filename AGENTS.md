@@ -122,7 +122,7 @@ flowchart LR
   - **宽限期**：`GRACE_MONTHS = 1`，只有上上月及更早的月份才归档结算；**上个月**和**本月**始终按明细实时计算。
   - 某月结算预算 = 该月有效预算（`time_to_effect <= 该月` 中 `time_to_effect` 最大、`id` 最大的一条）。
   - 月份归属按浏览器本地时区分桶，与 `YYYYMM` month key 口径一致；月份键工具为 `addMonthsKey`。
-  - UI 不单独展示结余；进度条分母为 `totalAvailable = 本月预算 + 累计结余`，`usagePercent` 基于 `totalAvailable` 计算。
+  - @usage 右下总额度按「预算±累计结余」拆分显示（如 `¥3500.00+178.20`、负结余为 `¥3500.00-178.20`；`|结余| < 0.005` 视为零，只显示预算），币种符号只在预算金额前出现一次。进度条分母为 `totalAvailable = 本月预算 + 累计结余`，`usagePercent` 基于 `totalAvailable` 计算。
 - **进度条时间进度标记**：`/record/@usage` 的进度条由 [`src/app/_components/progress-bar.tsx`](src/app/_components/progress-bar.tsx) 的 `ProgressBar` 渲染，可选参数 `markerPercent` 在对应百分比位置渲染一条竖线标记（不传则不渲染）。标记与进度条等高，两侧用 `mask-image` 渐变把轨道/填充抠出透明小缺口（不依赖表面色），线色统一为 `green-600`。注意本项目的深浅色主题靠 `prefers-color-scheme` 媒体查询驱动，没有 `.dark` 类，因此 class 式的 `dark:` 变体不生效。@usage 传入的是 `UsageSummary.monthElapsedPercent`（[`src/api/usage.ts`](src/api/usage.ts) 的 `getMonthElapsedPercent`）：今天（含）是当月第几天 / 当月总天数，浏览器本地时区，用于对比消费进度与时间进度。
 
 ## Git 与提交

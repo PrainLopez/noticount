@@ -38,14 +38,6 @@ export default function UsagePage() {
           <CardTitle className="text-lg">Usage</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <section className="space-y-1.5">
-            <Skeleton className="h-5 w-44" />
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-4 w-10" />
-              <Skeleton className="h-4 w-16" />
-            </div>
-          </section>
-
           <section className="space-y-2">
             <Skeleton className="h-5 w-52" />
             <div className="space-y-1.5">
@@ -54,7 +46,7 @@ export default function UsagePage() {
                 <Skeleton className="h-4 w-12" />
               </div>
               <Skeleton className="h-2 w-full rounded-full" />
-              <Skeleton className="h-4 w-32 ml-auto" />
+              <Skeleton className="h-4 w-44 ml-auto" />
             </div>
           </section>
         </CardContent>
@@ -99,21 +91,8 @@ export default function UsagePage() {
         <SetBudgetTrigger currentMonthKey={data.currentMonthKey} isFirstSetup={data.isFirstSetup} />
       </CardHeader>
       <CardContent className="space-y-5">
-        <section className="space-y-2">
-          <p className="text-sm font-semibold">7-Day Average Cost (Daily)</p>
-          {data.items.map(item => (
-            <div key={`avg-${item.currencyType}`} className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">{item.currencyType}</span>
-              <span className="font-semibold">
-                {currencySymbols[item.currencyType] || item.currencyType}
-                {item.avgLast7Days.toFixed(2)}
-              </span>
-            </div>
-          ))}
-        </section>
-
         <section className="space-y-3">
-          <p className="text-sm font-semibold">Monthly Budget Usage (Daily)</p>
+          <p className="text-sm font-semibold">Monthly Budget</p>
           {data.items.map((item) => {
             const percentText = `${item.usagePercent.toFixed(1)}%`;
 
@@ -127,7 +106,8 @@ export default function UsagePage() {
                 <p className="text-xs text-muted-foreground text-right">
                   {currencySymbols[item.currencyType] || item.currencyType}
                   {item.monthTotal.toFixed(2)} / {currencySymbols[item.currencyType] || item.currencyType}
-                  {item.totalAvailable.toFixed(2)}
+                  {item.budgetAmount.toFixed(2)}
+                  {Math.abs(item.carryover) >= 0.005 && `${item.carryover > 0 ? "+" : "-"}${Math.abs(item.carryover).toFixed(2)}`}
                 </p>
               </div>
             );

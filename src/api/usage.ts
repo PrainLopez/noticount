@@ -2,7 +2,6 @@ import type { MonthlySettlement } from "@/src/api/monthly-settlements";
 
 import { supabase } from "@/lib/supabase";
 import { getMonthlySettlements, upsertMonthlySettlements } from "@/src/api/monthly-settlements";
-import { getRecentRecordsPaginated } from "@/src/api/recent-by-day";
 import { requireSessionUserId } from "@/src/api/session-user";
 
 type AmountRecord = {
@@ -27,8 +26,8 @@ export type BudgetChange = {
 };
 
 export type UsageSummaryItem = {
-  avgLast7Days: number;
   budgetAmount: number;
+  carryover: number;
   currencyType: string;
   monthTotal: number;
   totalAvailable: number;
@@ -62,16 +61,6 @@ function getMonthStartFromKey(monthKey: number): Date {
 export function getMonthElapsedPercent(date: Date): number {
   const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   return (date.getDate() / daysInMonth) * 100;
-}
-
-function toMapByCurrency(records: AmountRecord[]): Record<string, number> {
-  return records.reduce((acc, record) => {
-    if (!acc[record.currency_type]) {
-      acc[record.currency_type] = 0;
-    }
-    acc[record.currency_type] += record.amount;
-    return acc;
-  }, {} as Record<string, number>);
 }
 
 function toMonthBucketsByCurrency(records: DailyExpenseRecord[]): Record<string, Record<number, number>> {
@@ -140,7 +129,6 @@ export function buildSettlementRows(input: {
 }
 
 export function buildUsageItem(input: {
-  avgLast7Days: number;
   budgetAmount: number;
   carryover: number;
   currencyType: string;
@@ -150,8 +138,8 @@ export function buildUsageItem(input: {
   const usagePercent = totalAvailable > 0 ? (input.monthTotal / totalAvailable) * 100 : 100;
 
   return {
-    avgLast7Days: input.avgLast7Days,
     budgetAmount: input.budgetAmount,
+    carryover: input.carryover,
     currencyType: input.currencyType,
     monthTotal: input.monthTotal,
     totalAvailable,
@@ -207,7 +195,6 @@ export async function getUsageSummary(): Promise<UsageSummary> {
     { data: budgetData, error: budgetError },
     { data: anyBudgetData, error: anyBudgetError },
     settledRows,
-    recentRecordsPage,
   ]
     = await Promise.all([
       supabase
@@ -223,7 +210,6 @@ export async function getUsageSummary(): Promise<UsageSummary> {
         .eq("user_id", userId)
         .limit(1),
       getMonthlySettlements(userId),
-      getRecentRecordsPaginated(0, userId),
     ]);
 
   if (budgetError) {
@@ -296,12 +282,8 @@ export async function getUsageSummary(): Promise<UsageSummary> {
 
   const carryoverByCurrency = sumSettledDeltaByCurrency([...settledRows, ...newSettlementRows, ...prevMonthRows]);
 
-  const last7DaysDailyRecords = recentRecordsPage.data.filter(record => record.record_type === "daily");
-  const last7DaysTotalByCurrency = toMapByCurrency(last7DaysDailyRecords);
-
   const items = budgetCurrencies.map((currencyType) => {
     return buildUsageItem({
-      avgLast7Days: (last7DaysTotalByCurrency[currencyType] ?? 0) / 7,
       budgetAmount: effectiveBudgetByCurrency[currencyType] ?? 0,
       carryover: carryoverByCurrency[currencyType] ?? 0,
       currencyType,
